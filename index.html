@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>ABCD</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0, minimum-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="stylesheet" type="text/css" href="static/app.css">
+    <link rel="stylesheet" type="text/css" href="static/indoorun.css">
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.1.0.js"></script>
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script type="text/javascript" src="static/libidrn.min.js"></script>
+  </head>
+  <body id="body">
+    <div id="map" class="page"></div>
+    <div id="emptyspace">
+      <emptyspace v-on:onclick="onFindEmptySpace" v-bind:dofind="doFind"></emptyspace>
+    </div>
+    <div id="locateState">
+      <locatestatediv v-bind:dolocate="dolocate" v-on:onclick="doLocating"></locatestatediv>
+    </div>
+    <div id="floorList">
+      <floorlistdiv v-bind:floorlist="floorList" v-bind:selectfloorid="currentFloorId" v-on:onselect="onSelect"></floorlistdiv>
+    </div>
+    <div id="app">
+      <findCar v-bind:type="findCarType" v-bind:map="map"></findCar>
+    </div>
+    <div id="footer">
+      <footBarBtn v-for="item in btnInfos" v-bind:data="item" v-bind:key="item.type" v-on:onbtnclick="onReceive"></footBarBtn>
+    </div>
+    <div id="publicfacility">
+      <publicfacilitydiv v-on:onclick="onclick"></publicfacilitydiv>
+    </div>
+    <div id="findfacility">
+      <findfacilityview v-bind:facilities="facilitys"></findfacilityview>
+    </div>
+  </body>
+</html>
