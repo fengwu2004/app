@@ -81,7 +81,6 @@
   width: 2.5rem;
   height: 2.5rem;
   transform: rotate(0deg);
-  background-size: 2.5rem;
-  background-image: url("./resetMap.png");
-  background-color: transparent;
+  background: url("./resetMap.png") transparent no-repeat;
+  background-size: contain;
 }

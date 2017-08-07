@@ -108,19 +108,19 @@
 
   .currentName {
     background: url("../assets/lou-01.png") no-repeat;
-    background-size: 2.5rem;
+    background-size: 2.3rem;
     color: #fff;
     text-align: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    line-height: 2.5rem;
+    width: 2.3rem;
+    height: 2.3rem;
+    line-height: 2.3rem;
     text-align: center;
   }
 
   .dropdown {
     width: 100%;
-    height: 2.5rem;
-    line-height: 2.5rem;
+    height: 2.3rem;
+    line-height: 2.3rem;
     text-align: center;
   }
 

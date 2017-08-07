@@ -1,14 +1,14 @@
 <template>
   <div class="main">
-    <div class="bg"></div>
+    <div class="bg" v-on:click="onClose"></div>
     <div class="content">
       <img class="tag" src="../assets/public_img.png">
-      <img class="closeBtn" src="../assets/close1.png" v-on:click="onClose">
+      <div class="closeBtn" v-on:click="onClose"></div>
       <p class="title">公共设施</p>
       <p class="tip">智能搜索 一键导航 规划最短路线</p>
       <h5><span>  搜一下  </span></h5>
       <div class="facilities">
-        <facilitybtn class="facility" v-for="facility in facilities" v-bind:key="facility.type" v-bind:item="facility"></facilitybtn>
+        <facilitybtn class="facility" v-for="facility in facilities" v-bind:key="facility.type" v-bind:item="facility" v-on:onclickunitwith="onClickUnit"></facilitybtn>
       </div>
     </div>
   </div>
@@ -23,7 +23,11 @@
     props:['facilities'],
     methods:{
       onClose:function() {
-        this.$el.style.visibility = 'hidden'
+        this.$root.$el.style.visibility = 'hidden'
+      },
+      onClickUnit:function(type) {
+        this.onClose()
+        this.$emit('onnavigateto', type)
       }
     },
     components: { facilitybtn }
@@ -120,9 +124,12 @@
   .closeBtn {
 
     position: absolute;
-    right:9px;
-    top:9px;
-    width: 0.8rem;
+    right:0px;
+    top:0px;
+    width: 3rem;
+    height: 3rem;
+    background-size: 1rem;
+    background: no-repeat center url("../assets/close1.png");
   }
 
   .facilities {

@@ -32,7 +32,10 @@
       <publicfacilitydiv v-on:onclick="onclick"></publicfacilitydiv>
     </div>
     <div id="findfacility">
-      <findfacilityview v-bind:facilities="facilitys"></findfacilityview>
+      <findfacilityview v-bind:facilities="facilitys" v-on:onnavigateto="onNavigateTo"></findfacilityview>
+    </div>
+    <div id="navigate">
+      <navigatebottombar v-bind:routers="routerpos"></navigatebottombar>
     </div>
   </body>
 </html>

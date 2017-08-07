@@ -29,13 +29,14 @@ export default {
     width: 35%;
     max-width: 50px;
     margin: 1.5% 0;
+    padding: 5px 0 0 0;
   }
 
   p {
     line-height: 14px;
-    font-size: 0.9rem;
+    font-size: 0.6rem;
     text-align: center;
-    padding: 5px 0;
+    padding: 0 0 5px 0;
     margin: 0;
   }
 

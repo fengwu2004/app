@@ -11,7 +11,7 @@
     props:['item'],
     methods: {
       onclick:function() {
-        this.$emit('onclick', this.item.type)
+        this.$emit('onclickunitwith', this.item.type)
         console.log(this.item.title)
       }
     }

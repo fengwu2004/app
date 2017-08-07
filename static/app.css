@@ -32,9 +32,8 @@ body, html {
 
 #floorList {
   position: absolute;
-  right: 10px;
-  top: 10%;
-  padding: 5px; }
+  right: 1.1rem;
+  top: 10%; }
 
 #emptyspace {
   top: 2%;
@@ -47,5 +46,11 @@ body, html {
 #publicfacility {
   left: 1rem;
   bottom: 23%; }
+
+#navigate {
+  z-index: 100;
+  width: 100%;
+  bottom: 0;
+  position: absolute; }
 
 /*# sourceMappingURL=app.css.map */
