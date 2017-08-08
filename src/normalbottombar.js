@@ -1,25 +1,7 @@
 import Vue from 'vue'
-import footbarbtn from './components/footBarBtn.vue'
+import normalbottombar from './components/normalBottombar.vue'
 
-var findEmptySpaceInfo = {
-  icon:'./static/kongwei.png',
-  title:'空位引导',
-  type:'0'
-}
-
-var findByBleInfo = {
-  icon:'./static/biaoji.png',
-  title:'蓝牙标记',
-  type:'1'
-}
-
-var findCarInfo = {
-  icon:'./static/zhaoche.png',
-  title:'找车',
-  type:'2'
-}
-
-function NormalBottomBar() {
+function NormalBottomBar(btninfos) {
   
   var _vm = null
   
@@ -27,10 +9,10 @@ function NormalBottomBar() {
     
     _vm = new Vue({
       el:'#footer',
-      components: { footbarbtn },
+      components: { normalbottombar },
       data: function() {
         return {
-          btnInfos: [findEmptySpaceInfo, findByBleInfo, findCarInfo],
+          btnInfos: btninfos,
         }
       },
       methods:{

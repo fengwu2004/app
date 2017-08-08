@@ -1,15 +1,16 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
-import findcar from './findCar.vue'
-import floorlistdiv from './components/floorList.vue'
 import indoorun from '../../indoorunMap/map.js'
-import emptyspace from './components/emptyspace.vue'
-import locatestatediv from './components/locatestatus.vue'
-import publicfacilitydiv from './components/publicfacility.vue'
+import FindCarView from './FindCarView'
+import FLoorListView from './floorlistview'
+import EmptySpaceView from './emptyspaceview'
+import LocateStatusView from './locatestatusview'
+import FindFacilityBtnView from './findfacilityview'
 import FindFacilityView from './findfacility'
 import NormalBottomBar from './normalbottombar'
-import navigatebottombar from './components/navigateBottombar.vue'
+import NavigateBottomBar from './navigateBottomBar'
+import AlertBox from './AlertBox'
 
 Vue.config.productionTip = false
 
@@ -17,107 +18,259 @@ var regionId = '14428254382730015'
 
 var idrMapView = indoorun.idrMapView
 
+var idrMapMarker = indoorun.idrMapMarker
+
 var map = new idrMapView()
 
-function addFloorListDiv(map) {
+var floorListView = null
+
+var emptySpaceView = null
+
+var locateStatusView = null
+
+var findFacilityBtnView = null
+
+var navigateBottomBar = null
+
+var normalBottomBar = null
+
+var findEmptySpaceInfo = {
+  icon:'/static/kongwei.png',
+  title:'空位引导',
+  type:'0',
+  cb:navigateToEmptySpace
+}
+
+var findByBleInfo = {
+  icon:'/static/biaoji.png',
+  title:'蓝牙标记',
+  type:'1',
+  cb:markWithBluetooth
+}
+
+var findCarInfo = {
+  icon:'/static/zhaoche.png',
+  title:'找车',
+  type:'2',
+  cb:function() {
+    showFindCarView()
+  }
+}
+
+function showNormalBottomBar(bshow) {
   
-  new Vue({
-    el:"#floorList",
-    components: { floorlistdiv },
-    data: function() {
-      return {
-        floorList:map.regionEx.floorList,
-        currentFloorId:map.getFloorId()
-      }
-    },
-    methods:{
-      onSelect:function(val) {
-        this.currentFloorId = val
-        map.changeFloor(val)
-      }
-    }
-  })
+  if (!normalBottomBar && bshow) {
+    
+    normalBottomBar = new NormalBottomBar([findEmptySpaceInfo, findByBleInfo, findCarInfo])
+  }
+  
+  normalBottomBar && normalBottomBar.show(bshow)
+}
+
+function showNavigateBottombar(bshow, path, cb) {
+  
+  if (!navigateBottomBar && bshow) {
+    
+    navigateBottomBar = new NavigateBottomBar(map)
+  }
+  
+  navigateBottomBar && navigateBottomBar.show(bshow, path, cb)
+}
+
+function showFindFacilityBtnView(bshow, cb) {
+  
+  if (!findFacilityBtnView && bshow) {
+  
+    findFacilityBtnView = new FindFacilityBtnView(cb)
+  }
+  
+  findFacilityBtnView && findFacilityBtnView.show(bshow)
+}
+
+function showLocateStatusView(bshow) {
+  
+  if (!locateStatusView && bshow) {
+  
+    locateStatusView = new LocateStatusView(map)
+  }
+  
+  locateStatusView && locateStatusView.show(bshow)
+}
+
+function showFloorListView(bshow) {
+  
+  if (!floorListView && bshow) {
+  
+    floorListView = new FLoorListView(map)
+  }
+  
+  floorListView && floorListView.show(bshow)
+}
+
+function showEmptySpaceView(bshow) {
+  
+  if (!emptySpaceView && bshow) {
+  
+    emptySpaceView = new EmptySpaceView(map)
+  }
+  
+  emptySpaceView && emptySpaceView.show(bshow)
 }
 
 map.initMap('2b497ada3b2711e4b60500163e0e2e6b', 'map', regionId)
 
-map.addEventListener(map.eventTypes.onFloorChangeSuccess, function() {
+map.addEventListener(map.eventTypes.onFloorChangeSuccess, function(data) {
   
-  addFloorListDiv(map)
+  floorListView.setCurrentFloor(data.floorId)
   
   map.doLocation(function(pos) {
-    
-    // console.log(pos)
     
     map.setCurrPos(pos)
   })
 })
 
+function checkExit() {
+  
+  showAlertBox(true, '是否结束本次导航', function() {
+    
+    map.stopRoute()
+    
+    showAlertBox(false, '', null)
+  })
+}
+
+var endMarker = null
+
+map.addEventListener(map.eventTypes.onRouterFinish, function() {
+  
+  showNavigateBottombar(false, null, null)
+  
+  showSomeUIInNavi(true)
+  
+  map.removeMarker(endMarker)
+})
+
+function addEndMarker(pos) {
+  
+  var IDREndMarker = indoorun.idrMapMarker.IDREndMarker
+  
+  var endMarker = new IDREndMarker(pos, '/static/markericon/end.png')
+  
+  map.addMarker(endMarker)
+  
+  return endMarker
+}
+
+function showSomeUIInNavi(bshow) {
+  
+  showFloorListView(bshow)
+  
+  showEmptySpaceView(bshow)
+  
+  showNormalBottomBar(bshow)
+  
+  showFindFacilityBtnView(bshow, function() {
+  
+    showFindFacilityView()
+  })
+}
+
+map.addEventListener(map.eventTypes.onRouterSuccess, function(data) {
+  
+  endMarker = addEndMarker(data.end)
+  
+  showSomeUIInNavi(false)
+  
+  showNavigateBottombar(true, data.path, checkExit)
+})
+
 map.addEventListener(map.eventTypes.onInitMapSuccess, function(regionEx) {
   
   map.changeFloor(regionEx.floorList[0].id)
+  
+  showFloorListView(true)
+  
+  showEmptySpaceView(true)
+  
+  showLocateStatusView(true)
+  
+  showFindFacilityBtnView(true, function() {
+  
+    showFindFacilityView()
+  })
+  
+  showNormalBottomBar(true)
 })
 
-new Vue({
-  el: '#app',
-  components: { findcar },
-  data:function() {
-    return {
-      findCarType:3,
-      map:map
-    }
+var findcarview = null
+
+var tempMarkers = []
+
+function onFindTargetUnits(units) {
+  
+  tempMarkers.length = 0
+  
+  if (units.length == 1) {
+  
+    map.doRoute(map.getUserPos(), units[0].getPos())
+    
+    return
   }
-})
-
-var normalBottomBar = null
-
-function showNormalBottomBar() {
   
-  normalBottomBar = new NormalBottomBar()
+  showEmptySpaceView(false)
   
-  normalBottomBar.show(true)
+  showFindFacilityBtnView(false)
+  
+  showNormalBottomBar(false)
+  
+  for (var i = 0; i < units.length; ++i) {
+  
+    var IDRMapMarker = indoorun.idrMapMarker.IDRMapMarker
+    
+    var marker = new IDRMapMarker(units[i].getPos(), '/static/markericon/temppoint.png')
+    
+    map.addMarker(marker)
+  
+    tempMarkers.push(marker)
+  }
+  
+  map.addEventListener('onMarkerClick', function(marker) {
+  
+    var pos = marker.position
+    
+    for (var i = 0; i < tempMarkers.length; ++i) {
+  
+      map.removeMarker(tempMarkers[i])
+    }
+  
+    endMarker = new IDRMapMarker(pos, '/static/markericon/end.png')
+    
+    map.addMarker(endMarker)
+    
+    map.doRoute(map.getUserPos(), pos)
+  })
 }
 
-showNormalBottomBar()
-
-new Vue({
-  el:'#emptyspace',
-  components: { emptyspace },
-  methods: {
-    onFindEmptySpace:function onFindEmptySpace(value) {
+function showFindCarView() {
+  
+  if (!findcarview) {
+  
+    findcarview = new FindCarView(map, function(units) {
     
-    
-    }
-  },
-  data: function() {
-    return {
-      doFind:false
-    }
+      onFindTargetUnits(units)
+    })
   }
-})
+  
+  findcarview.show(0)
+}
 
-new Vue({
-  
-  el:'#locateState',
-  
-  components: { locatestatediv },
-  
-  methods: {
-    
-    doLocating:function doLocating() {
-    
-      this.dolocate = true
-      
-      map.centerPos(map.userPos(), true)
-    }
-  },
-  
-  data: function() {
-    return {
-      dolocate:false
-    }
-  }
-})
+function navigateToEmptySpace() {
+
+}
+
+function markWithBluetooth() {
+
+}
 
 var findFacilityView = null
 
@@ -131,28 +284,14 @@ function showFindFacilityView() {
   findFacilityView.show()
 }
 
-function addFacilityBtn() {
+var alertboxdiv = null
+
+function showAlertBox(bshow, message, confirmcb) {
+
+  if (!alertboxdiv) {
   
-  new Vue({
-    el:'#publicfacility',
-    components: { publicfacilitydiv },
-    methods: {
-      onclick:function () {
-        
-        showFindFacilityView()
-      }
-    },
-  })
-}
-
-addFacilityBtn()
-
-new Vue({
-  el:'#navigate',
-  components:{ navigatebottombar },
-  data: function() {
-    return {
-      routerpos:['始', 'B1', 'B2', '终']
-    }
+    alertboxdiv = new AlertBox()
   }
-})
+  
+  alertboxdiv.show(bshow, message, confirmcb)
+}

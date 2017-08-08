@@ -1,9 +1,8 @@
 <template>
   <div class="main">
-    <div class="routerpos">
-      <div class="pos" v-for="router in routers" v-bind:key="router"><span v-bind:key="router" v-on:click="click()">{{ router }}</span>
-      </div>
-    </div>
+    <img class="quit" src="../assets/quit.png" v-on:click="exit(false)"/>
+    <div class="route" v-for="router in routers" v-bind:key="router.id"><span>{{ router.name }}</span><img src="../assets/jiantou.png"/></div>
+    <span>终</span>
   </div>
 </template>
 
@@ -21,35 +20,16 @@
     }
   }
 
-  function select(el, parentNode) {
-
-    var spans = parentNode.getElementsByTagName('span')
-
-    for (var i = 0; i < spans.length; ++i) {
-
-      var span = spans[i]
-
-      if (span === el) {
-
-        span.classList.add('span_selected')
-      }
-      else {
-
-        span.className = ''
-      }
-    }
-  }
-
   export default {
     name : 'navigatebottombar',
     props:['routers'],
     methods: {
-      show:show,
-      click:function() {
-
+      exit:function() {
+        this.$emit('onexit', true)
+      },
+      click:function(value) {
         var el = event.target
-
-        select(el, this.$el)
+        el.disabledenable = true
       }
     }
   }
@@ -60,63 +40,53 @@
 
   .main {
     width: 100%;
-    height: 2rem;
+    height: 1.5rem;
     padding: 0.8rem 0;
     position: absolute;
     bottom: 0px;
     left: 0;
-    background-color: #18202a;
+    background-color: #0b79f2;
     text-align: center;
   }
 
-  .routerpos {
+  .route {
 
-    display: flex;
-    width: 80%;
-    left: 0;right: 0;
-    margin: auto;
-    height: 100%;
+    display: inline-block;
   }
 
   span {
     display: inline-block;
-    width: 2rem;
-    height: 2rem;
-    margin:0 3px;
-    font-size: 1rem;
-    line-height: 2rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin:0 5px;
+    font-size: 0.8rem;
+    line-height: 1.5rem;
     font-family: ".SF NS Display";
     color: white;
     border-radius: 50%;
     border: 1px solid white;
   }
 
-  .span_selected {
-    color: red;
-  }
-
-  .pos {
-    flex: 1;
-    display: inline-block;
-    /*text-align: center;*/
-  }
-
-  .start {
+  span:first-child {
 
     background-color: white;
     color: #0b79f2;
   }
 
   .quit {
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 1.2rem;
+    height: 1.2rem;
     left: 1rem;
+    top:0;
+    bottom: 0;
+    margin: auto;
     position: absolute;
     background: url("../assets/quit.png") no-repeat;
     background-size: contain;
   }
 
   img {
+    display: inline-block;
     line-height: 1.5rem;
     width: 50px;
   }

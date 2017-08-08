@@ -7,12 +7,11 @@
 
 <script>
 export default {
-  name : 'footBarBtn',
+  name : 'normalbottombar',
   props:['data'],
   methods: {
     onclick:function() {
-      this.$emit('onbtnclick', this.data.type)
-      console.log(this.data.title)
+      this.data.cb && this.data.cb()
     }
   }
 }

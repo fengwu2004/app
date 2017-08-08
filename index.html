@@ -22,11 +22,12 @@
     <div id="floorList">
       <floorlistdiv v-bind:floorlist="floorList" v-bind:selectfloorid="currentFloorId" v-on:onselect="onSelect"></floorlistdiv>
     </div>
-    <div id="app">
-      <findCar v-bind:type="findCarType" v-bind:map="map"></findCar>
+    <div id="findCar">
+      <findwithnum v-show="type === findbynum" v-bind:map="map" v-on:onclose="onClose"></findwithnum>
+      <findwithunit v-show="type === findbyunit" v-on:onfindunits="onFindUnits" v-bind:map="map" v-on:onclose="onClose" v-on:onmarkinmap="onMarkInMap"></findwithunit>
     </div>
     <div id="footer">
-      <footBarBtn v-for="item in btnInfos" v-bind:data="item" v-bind:key="item.type" v-on:onbtnclick="onReceive"></footBarBtn>
+      <normalbottombar v-for="item in btnInfos" v-bind:data="item" v-bind:key="item.type" v-on:onclick="onReceive"></normalbottombar>
     </div>
     <div id="publicfacility">
       <publicfacilitydiv v-on:onclick="onclick"></publicfacilitydiv>
@@ -35,7 +36,10 @@
       <findfacilityview v-bind:facilities="facilitys" v-on:onnavigateto="onNavigateTo"></findfacilityview>
     </div>
     <div id="navigate">
-      <navigatebottombar v-bind:routers="routerpos"></navigatebottombar>
+      <navigatebottombar v-bind:routers="routerpos" v-on:onexit="onStopNavigate"></navigatebottombar>
+    </div>
+    <div id="alertbox">
+      <alertbox v-bind:message="message" v-on:onconfirm="confirm" v-on:oncancel="cancel"></alertbox>
     </div>
   </body>
 </html>

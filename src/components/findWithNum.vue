@@ -1,8 +1,8 @@
 <template>
-  <div>
-    <div class="bg"></div>
+  <div class="main">
+    <div class="bg" v-on:click="onClose"></div>
     <div class="content">
-      <img class="closeBtn" src="../assets/close1.png" v-on:click="onClose()">
+      <div class="closeBtn" v-on:click="onClose()"></div>
       <img class="tag" src="../assets/car.png">
       <p class="title">车牌找车</p>
       <p class="tip">请输入您的车牌号</p>
@@ -18,54 +18,52 @@
 
 <script>
 
+  import indoorun from '../../../indoorunMap/map.js'
 
-
-  var self = this
-
-//  var idrNetworkInstance = indoorunMap.map.idrNetworkInstance
-
-//  var idrCoreManagerInstance = indoorunMap.map.idrCoreManagerInstance
+  const idrNetworkInstance = indoorun.idrNetworkInstance
 
   function onClose() {
 
-    this.$el.style.visibility = 'hidden'
+    this.$emit('onclose', '0')
   }
 
   function onFindbyUnit() {
 
     this.onClose()
 
-    this.$emit('onUnit', 1)
+    this.$emit('onclose', 1)
   }
 
-  function onConfirm() {
+  function onConfirm(self) {
 
-    console.log(this.carNumber)
+    console.log(self.carNumber)
 
-    const url = 'http://wx.indoorun.com/chene/getParkingPlaceUnitByCarNo.html'
+    var host = "http://192.168.0.101:8888/"
+
+    const url = host + 'chene/getParkingPlaceUnitByCarNo.html'
 
     var data = {
-      'regionId': self.$props.map.getRegionId(),
-      'clientId': idrCoreManagerInstance.clientId,
-      'appId': idrCoreManagerInstance.appId,
-      'sessionKey': idrCoreManagerInstance.sessionKey,
+      'regionId': self.map.getRegionId(),
       'carNo': self.carNumber,
-      'floorId': self.$props.map.getFloorId(),
+      'floorId': self.map.getFloorId(),
     }
 
-//    idrNetworkInstance.doAjax(url, data, function(res) {
-//
-//      var unit = res.parkingUnit
-//
-//
-//    }, function() {
-//
-//
-//    })
+    idrNetworkInstance.doAjax(url, data, function(res) {
+
+      var data = res.data
+
+      var unit = new indoorun.idrUnit(data.parkingUnit)
+
+      self.map.doRoute(self.map.getUserPos(), unit.getPos())
+
+    }, function(res) {
+
+
+    })
   }
 
   export default {
-    name:'findWithNum',
+    name:'findwithnum',
     props:['map'],
     data:function() {
       return {
@@ -74,7 +72,12 @@
     },
     methods: {
       onClose:onClose,
-      onConfirm:onConfirm,
+      onConfirm:function() {
+
+        this.onClose()
+
+        onConfirm(this)
+      },
       onCancel:onFindbyUnit,
     }
 }
@@ -82,6 +85,16 @@
 </script>
 
 <style scoped>
+
+  .main {
+    position: absolute;
+    left:0;
+    right:0;
+    top:0;
+    bottom:0;
+    margin:0;
+  }
+
   .bg {
     position: absolute;
     left:0;
@@ -103,13 +116,18 @@
     left: 0;
     right: 0;
     margin: auto;
+    z-index: 100;
   }
 
   .closeBtn {
+
     position: absolute;
-    right: 9px;
-    top: 9px;
-    width: 0.8rem;
+    right:1px;
+    top:1px;
+    width: 3rem;
+    height: 3rem;
+    background-size: 1rem;
+    background: no-repeat center url("../assets/close1.png");
   }
 
   .tag {
@@ -202,7 +220,7 @@
   }
 
   h5 {
-    width: 70%;
+    width: 80%;
     margin: auto;
     color: lightgray;
   }

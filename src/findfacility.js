@@ -121,7 +121,7 @@ function FindFacilityView(map) {
     
     var unit = units[0]
     
-    map.doRoute(map.userPos(), unit.getPos())
+    map.doRoute(map.getUserPos(), unit.getPos())
   }
   
   function show() {

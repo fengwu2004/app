@@ -1,17 +1,17 @@
 <template>
-  <div>
-    <div class="bg"></div>
+  <div class="main">
+    <div class="bg" v-on:click="onClose"></div>
     <div class="content">
-      <img class="closeBtn" src="../assets/close1.png" v-on:click="onClose()">
+      <div class="closeBtn" v-on:click="onClose"></div>
       <img class="tag" src="../assets/car.png">
       <p class="title">输入车位号找车</p>
       <p class="tip">请输入您的车辆所停位置的车位号</p>
-      <div id="floors">
-        <div class="floor" v-for="floor in floorList" v-bind:key="floor.id">{{ floor.name }}</div>
+      <div class="floors">
+        <div v-for="floor in floorlist" v-bind:key="floor.id" class="floor" v-bind:class="getFloorStyle(floor.id)" v-on:click="onSelectFloor(floor.id)">{{ floor.name }}</div>
       </div>
       <input v-model="unitName" placeholder="例：026">
-      <p class="errortip" id="errortip">输入有误，请重新输入您的车位号!</p>
-      <div class="confirmBtn">确定</div>
+      <p class="errortip" v-bind:style="{visibility:errortipVisible}">输入有误，请重新输入您的车位号!</p>
+      <div class="confirmBtn" v-on:click="onConfirm">确定</div>
       <h5><span>  or  </span></h5>
       <div class="cancelBtn" v-on:click="onCancel()">地图标记</div>
       <br>
@@ -23,32 +23,94 @@
 
   function onClose() {
 
-    this.$el.style.visibility = 'hidden'
+    this.$emit('onclose', 2)
   }
 
   function onCancel() {
 
     this.onClose()
 
-    this.$emit('onMarkInMap', 1)
+    this.$emit('onmarkinmap')
+  }
+
+  function onConfirm() {
+
+    var units = this.map.findUnitWithName(this.selectedFloorId, this.unitName)
+
+    if (!units) {
+
+      this.findError = true
+    }
+    else {
+
+      this.onClose()
+
+      this.$emit('onfindunits', units)
+    }
+  }
+
+  function onSelectFloor(floorId) {
+
+    this.selectedFloorId = floorId
+
+    this.map.autoChangeFloor = false
+
+    this.map.changeFloor(floorId)
+  }
+
+  function getFloorStyle(floorId) {
+
+    if (floorId === this.selectedFloorId) {
+
+      return 'floor floorSelected'
+    }
+    else {
+
+      return 'floor'
+    }
   }
 
   export default {
-    name:'findWithUnit',
-    props:['floorList'],
+    name:'findwithunit',
+    props:['map'],
     data:function() {
       return {
-        unitName:''
+        unitName:'',
+        findError:false,
+        floorlist:this.map.regionEx.floorList,
+        selectedFloorId:this.map.getFloorId()
       }
+    },
+    computed:{
+      errortipVisible:function() {
+        if (this.findError) {
+          return 'visible'
+        }
+        return 'hidden'
+      },
+
     },
     methods:{
       onClose:onClose,
       onCancel:onCancel,
+      onConfirm:onConfirm,
+      onSelectFloor:onSelectFloor,
+      getFloorStyle:getFloorStyle
     }
   }
 </script>
 
 <style scoped>
+
+  .main {
+    position: absolute;
+    left:0;
+    right:0;
+    top:0;
+    bottom:0;
+    margin:0;
+  }
+
   .bg {
     background-color: #9D9D9D;
     left: 0;
@@ -69,23 +131,11 @@
     left: 0;
     right: 0;
     margin: auto;
-  }
-
-  .MarkCarWithNum {
-
-    border-radius: 5px;
-    background-color: white;
-    position: absolute;
-    width: 80%;
-    top: 20%;
-    left:0;
-    right:0;
-    margin: auto;
+    z-index: 100;
   }
 
   .errortip {
 
-    visibility: hidden;
     width: 80%;
     color: red;
     font-size: 0.5rem;
@@ -95,9 +145,12 @@
   .closeBtn {
 
     position: absolute;
-    right:9px;
-    top:9px;
-    width: 0.8rem;
+    right:10px;
+    top:10px;
+    width: 3rem;
+    height: 3rem;
+    background-size: 1rem;
+    background: transparent no-repeat center url("../assets/close1.png");
   }
 
   .tag {
@@ -125,7 +178,7 @@
     padding-bottom: 10px;
     color: #9D9D9D;
     font-weight: 200;
-    font-size: 0.875rem;
+    font-size: 0.7rem;
   }
 
   input {
@@ -147,15 +200,6 @@
     color: dodgerblue;
     font-size: 1rem;
     font-weight: 100;
-  }
-
-  .errorTip {
-
-    visibility: hidden;
-    width: 80%;
-    color: red;
-    font-size: 0.5rem;
-    margin: auto;
   }
 
   .confirmBtn {
@@ -186,7 +230,7 @@
 
   h5 {
 
-    width: 70%;
+    width: 80%;
     margin: auto;
     color: lightgray;
   }
@@ -208,7 +252,7 @@
     width: 45%;
   }
 
-  #floors {
+  .floors {
 
     text-align: center;
   }
