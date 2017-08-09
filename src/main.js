@@ -11,14 +11,13 @@ import FindFacilityView from './findfacility'
 import NormalBottomBar from './normalbottombar'
 import NavigateBottomBar from './navigateBottomBar'
 import AlertBox from './AlertBox'
+import BottomBar from './bottombar'
 
 Vue.config.productionTip = false
 
 var regionId = '14428254382730015'
 
 var idrMapView = indoorun.idrMapView
-
-var idrMapMarker = indoorun.idrMapMarker
 
 var map = new idrMapView()
 
@@ -181,6 +180,8 @@ map.addEventListener(map.eventTypes.onRouterSuccess, function(data) {
   
   showSomeUIInNavi(false)
   
+  showBottomBar(false)
+  
   showNavigateBottombar(true, data.path, checkExit)
 })
 
@@ -243,11 +244,31 @@ function onFindTargetUnits(units) {
       map.removeMarker(tempMarkers[i])
     }
   
-    endMarker = new IDRMapMarker(pos, '/static/markericon/end.png')
-    
-    map.addMarker(endMarker)
+    tempMarkers.length = 0
     
     map.doRoute(map.getUserPos(), pos)
+  
+    map.removeEventListener('onMarkerClick')
+  })
+}
+
+function onMarkUnitInMap() {
+  
+  showEmptySpaceView(false)
+  
+  showFindFacilityBtnView(false)
+  
+  showNormalBottomBar(false)
+  
+  showBottomBar(true)
+  
+  map.addEventListener('onMapLongPress', function(pos) {
+  
+    map.doRoute(map.getUserPos(), pos)
+  
+    map.removeEventListener('onMapLongPress')
+  
+    showBottomBar(false)
   })
 }
 
@@ -258,6 +279,10 @@ function showFindCarView() {
     findcarview = new FindCarView(map, function(units) {
     
       onFindTargetUnits(units)
+      
+    }, function() {
+    
+      onMarkUnitInMap()
     })
   }
   
@@ -269,6 +294,7 @@ function navigateToEmptySpace() {
 }
 
 function markWithBluetooth() {
+
 
 }
 
@@ -288,10 +314,22 @@ var alertboxdiv = null
 
 function showAlertBox(bshow, message, confirmcb) {
 
-  if (!alertboxdiv) {
+  if (!alertboxdiv && bshow) {
   
     alertboxdiv = new AlertBox()
   }
   
-  alertboxdiv.show(bshow, message, confirmcb)
+  alertboxdiv && alertboxdiv.show(bshow, message, confirmcb)
+}
+
+var bottomBar = null
+
+function showBottomBar(bshow) {
+  
+  if (!bottomBar && bshow) {
+  
+    bottomBar = new BottomBar()
+  }
+  
+  bottomBar && bottomBar.show(bshow)
 }

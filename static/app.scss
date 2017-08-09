@@ -72,3 +72,11 @@ body, html {
 #alertbox {
   z-index: 999;
 }
+
+#bottombar {
+  position: absolute;
+  width: 100%;
+  height: 3rem;
+  z-index: 999;
+  bottom:0;
+}

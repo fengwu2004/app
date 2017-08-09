@@ -38,7 +38,7 @@
 
     console.log(self.carNumber)
 
-    var host = "http://192.168.0.101:8888/"
+    var host = "http://192.168.0.108:8888/"
 
     const url = host + 'chene/getParkingPlaceUnitByCarNo.html'
 

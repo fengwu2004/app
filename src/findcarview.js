@@ -5,7 +5,7 @@ import findwithunit from './components/findWithUnit.vue'
 const findtype_withnumber = 0
 const findtype_withunit = 1
 
-function FindCarView(map, callback) {
+function FindCarView(map, findUnitsCallBack, markUnitInMapCallBack) {
   
   var _vm = null
   
@@ -13,7 +13,9 @@ function FindCarView(map, callback) {
   
   var _type = 0
   
-  var _cb = callback
+  var _findUnitsCallBack = findUnitsCallBack
+  
+  var _markUnitInMapCallBack = markUnitInMapCallBack
   
   function load() {
     
@@ -34,12 +36,12 @@ function FindCarView(map, callback) {
           this.type = value
         },
         onMarkInMap:function() {
-        
-        
+  
+          _markUnitInMapCallBack && _markUnitInMapCallBack()
         },
         onFindUnits:function(units) {
   
-          _cb && _cb(units)
+          _findUnitsCallBack && _findUnitsCallBack(units)
         }
       }
     })
