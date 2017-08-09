@@ -12,6 +12,7 @@ import NormalBottomBar from './normalbottombar'
 import NavigateBottomBar from './navigateBottomBar'
 import AlertBox from './AlertBox'
 import BottomBar from './bottombar'
+import MarkWithBleView from './markwithble'
 
 Vue.config.productionTip = false
 
@@ -32,6 +33,15 @@ var findFacilityBtnView = null
 var navigateBottomBar = null
 
 var normalBottomBar = null
+
+var markWithBleView = null
+
+function showMarkWithBle(unit) {
+  
+  markWithBleView = new MarkWithBleView(unit)
+  
+  markWithBleView.show(true)
+}
 
 var findEmptySpaceInfo = {
   icon:'/static/kongwei.png',
@@ -295,7 +305,12 @@ function navigateToEmptySpace() {
 
 function markWithBluetooth() {
 
-
+  var pos = map.getUserPos()
+  
+  if (!pos) {
+  
+    return
+  }
 }
 
 var findFacilityView = null

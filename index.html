@@ -26,6 +26,9 @@
       <findwithnum v-show="type === findbynum" v-bind:map="map" v-on:onclose="onClose"></findwithnum>
       <findwithunit v-show="type === findbyunit" v-on:onfindunits="onFindUnits" v-bind:map="map" v-on:onclose="onClose" v-on:onmarkinmap="onMarkInMap"></findwithunit>
     </div>
+    <div id="markwithble">
+      <markwithble v-bind:unit="unit" v-on:confirm="onConfirm" v-on:close="onClose"></markwithble>
+    </div>
     <div id="footer">
       <normalbottombar v-for="item in btnInfos" v-bind:data="item" v-bind:key="item.type" v-on:onclick="onReceive"></normalbottombar>
     </div>
