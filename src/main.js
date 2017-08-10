@@ -13,6 +13,7 @@ import NavigateBottomBar from './navigateBottomBar'
 import AlertBox from './AlertBox'
 import BottomBar from './bottombar'
 import MarkWithBleView from './markwithble'
+import UpdateMarkerView from './updatemarkerview'
 
 Vue.config.productionTip = false
 
@@ -36,9 +37,57 @@ var normalBottomBar = null
 
 var markWithBleView = null
 
+var updateMarkerView = null
+
+function onSavePackingUnit(unit) {
+  
+  var pos = unit.getPos()
+  
+  var url = '/saveCheLocation.html'
+  
+  var data = {
+    unitId: unit.id,
+    floorId: unit.floorId,
+    regionId: map.getRegionId(),
+    svgX: pos.x,
+    svgY: pos.y
+  }
+  
+  indoorun.idrNetworkInstance.doAjax(url, {sName:data}, function() {
+  
+    console.log('保存成功')
+    
+  }, function() {
+  
+    console.log('保存失败')
+  })
+}
+
 function showMarkWithBle(unit) {
   
-  markWithBleView = new MarkWithBleView(unit)
+  if (!markWithBleView) {
+  
+    markWithBleView = new MarkWithBleView(map, unit, function(parkingUnit) {
+    
+      onSavePackingUnit(parkingUnit)
+      
+      endMarker = addEndMarker(parkingUnit.getPos())
+      
+      map.addEventListener(map.eventTypes.onMarkerClick, function(marker) {
+        
+        map.centerPos(marker.position, false)
+        
+        var pos = map.getScreenPos(marker.position)
+
+        showUpdateMarkerView(true, pos)
+        
+        map.addEventListener(map.eventTypes.onMapClick, function() {
+          
+          showUpdateMarkerView(false, null)
+        })
+      })
+    })
+  }
   
   markWithBleView.show(true)
 }
@@ -54,7 +103,9 @@ var findByBleInfo = {
   icon:'/static/biaoji.png',
   title:'蓝牙标记',
   type:'1',
-  cb:markWithBluetooth
+  cb:function() {
+    markWithBluetooth()
+  }
 }
 
 var findCarInfo = {
@@ -62,7 +113,7 @@ var findCarInfo = {
   title:'找车',
   type:'2',
   cb:function() {
-    showFindCarView()
+    onFindCar()
   }
 }
 
@@ -157,6 +208,8 @@ map.addEventListener(map.eventTypes.onRouterFinish, function() {
   showSomeUIInNavi(true)
   
   map.removeMarker(endMarker)
+  
+  endMarker = null
 })
 
 function addEndMarker(pos) {
@@ -186,7 +239,10 @@ function showSomeUIInNavi(bshow) {
 
 map.addEventListener(map.eventTypes.onRouterSuccess, function(data) {
   
-  endMarker = addEndMarker(data.end)
+  if (!endMarker) {
+  
+    endMarker = addEndMarker(data.end)
+  }
   
   showSomeUIInNavi(false)
   
@@ -282,6 +338,18 @@ function onMarkUnitInMap() {
   })
 }
 
+function onFindCar() {
+
+  if (endMarker) {
+  
+    map.doRoute(map.getUserPos(), endMarker.position)
+  }
+  else {
+    
+    showFindCarView()
+  }
+}
+
 function showFindCarView() {
   
   if (!findcarview) {
@@ -311,6 +379,8 @@ function markWithBluetooth() {
   
     return
   }
+  
+  showMarkWithBle(map.getNearUnit(pos))
 }
 
 var findFacilityView = null
@@ -347,4 +417,14 @@ function showBottomBar(bshow) {
   }
   
   bottomBar && bottomBar.show(bshow)
+}
+
+function showUpdateMarkerView(show, pos) {
+
+  if (!updateMarkerView && show) {
+  
+    updateMarkerView = new UpdateMarkerView()
+  }
+  
+  updateMarkerView && updateMarkerView.show(show, pos)
 }

@@ -5,7 +5,7 @@
       <div class="closeBtn" v-on:click="onClose"></div>
       <img class="tag" src="../assets/bluetooth_img.png">
       <p class="title">蓝牙自动标记</p>
-      <p class="tip">标记当前位置{{ unit.name }}为停车位置</p>
+      <p class="tip">标记当前位置<span>{{ name }}</span>为停车位置</p>
       <div class="confirmBtn" v-on:click="onConfirm">确定</div>
       <br>
     </div>
@@ -26,7 +26,7 @@
 
   export default {
     name:'markwithble',
-    props:['unit'],
+    props:['name'],
     methods:{
       onClose:onClose,
       onConfirm:onConfirm,
@@ -61,7 +61,7 @@
     background-color: white;
     position: absolute;
     width: 80%;
-    top: 20%;
+    top: 30%;
     left: 0;
     right: 0;
     margin: auto;
@@ -71,11 +71,11 @@
   .closeBtn {
 
     position: absolute;
-    right:10px;
-    top:10px;
+    right:0px;
+    top:0px;
     width: 3rem;
     height: 3rem;
-    background-size: 1rem;
+    background-size: 0.8rem;
     background: transparent no-repeat center url("../assets/close1.png");
   }
 
@@ -104,7 +104,9 @@
     padding-bottom: 10px;
     color: #9D9D9D;
     font-weight: 200;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
+    line-height: 1.5rem;
+    height: 1.5rem;
   }
 
   .confirmBtn {
@@ -118,6 +120,16 @@
     border-radius: 3px;
     border: 2px solid #0086ff;
     padding: 0px 10px;
+  }
+
+  span {
+    font-size: 1.2rem;
+    color: #0086ff;
+    padding: 0 2px;
+    height: 1.5rem;
+    line-height: 1.4rem;
+    font-weight: 300;
+    font-family: "Microsoft Yahei", "Arial", "Helvetica";
   }
 
 </style>

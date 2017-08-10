@@ -1,26 +1,32 @@
 import Vue from 'vue'
 import markwithble from './components/markwithble.vue'
 
-function MarkWithBleView(unit) {
+function MarkWithBleView(map, unit, confirmCallBack) {
   
   var _vm = null
   
+  var _map = map
+  
   var _unit = unit
+  
+  var _confirmCallBack = confirmCallBack
   
   function load() {
     
     _vm = new Vue({
       el:'#markwithble',
       components: { markwithble },
-      data: function() {
-        return {
-          unit:_unit
+      computed: {
+        name:function() {
+          return _map.regionEx.getFloorbyId(_unit.floorId).name + ' - ' + _unit.name
         }
       },
       methods: {
         onConfirm:function() {
   
           this.$el.style.visibility = 'hidden'
+  
+          _confirmCallBack && _confirmCallBack(_unit)
         },
         onClose:function() {
          

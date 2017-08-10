@@ -1,5 +1,5 @@
 <template>
-  <div v-on:click="onclick()">
+  <div  v-on:click="onclick">
     <img :src="data.icon"/>
     <p> {{ data.title }} </p>
   </div>
@@ -11,6 +11,7 @@ export default {
   props:['data'],
   methods: {
     onclick:function() {
+      console.log('按了')
       this.data.cb && this.data.cb()
     }
   }

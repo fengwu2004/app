@@ -27,10 +27,10 @@
       <findwithunit v-show="type === findbyunit" v-on:onfindunits="onFindUnits" v-bind:map="map" v-on:onclose="onClose" v-on:onmarkinmap="onMarkInMap"></findwithunit>
     </div>
     <div id="markwithble">
-      <markwithble v-bind:unit="unit" v-on:confirm="onConfirm" v-on:close="onClose"></markwithble>
+      <markwithble v-bind:name="name" v-on:confirm="onConfirm" v-on:close="onClose"></markwithble>
     </div>
     <div id="footer">
-      <normalbottombar v-for="item in btnInfos" v-bind:data="item" v-bind:key="item.type" v-on:onclick="onReceive"></normalbottombar>
+      <normalbottombar v-for="item in btnInfos" v-bind:data="item" v-bind:key="item.type"></normalbottombar>
     </div>
     <div id="publicfacility">
       <publicfacilitydiv v-on:onclick="onclick"></publicfacilitydiv>
@@ -46,6 +46,9 @@
     </div>
     <div id="bottombar">
      <bottombar></bottombar>
+    </div>
+    <div id="updatemaker">
+      <updatemarkerview v-bind:x="x" v-bind:y="y"></updatemarkerview>
     </div>
   </body>
 </html>
