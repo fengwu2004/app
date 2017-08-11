@@ -42,7 +42,7 @@
       <navigatebottombar v-bind:routers="routerpos" v-on:onexit="onStopNavigate"></navigatebottombar>
     </div>
     <div id="alertbox">
-      <alertbox v-bind:message="message" v-on:onconfirm="confirm" v-on:oncancel="cancel"></alertbox>
+      <alertbox v-bind:title="title" v-bind:message="message" v-bind:buttons="buttons"></alertbox>
     </div>
     <div id="bottombar">
      <bottombar v-bind:message="message"></bottombar>
@@ -51,7 +51,10 @@
       <updatemarkerview v-bind:x="x" v-bind:y="y" v-on:ondelete="deleteMarker" v-on:onchangepos="changeMarkerPos" v-on:onshare="share"></updatemarkerview>
     </div>
     <div id="errortip">
-      <errortipview v-bind:message="message"></errortipview>
+      <errortipview v-bind:message="message" v-bind:opacity="display"></errortipview>
+    </div>
+    <div id="zoom">
+      <zoom v-bind:map="map"></zoom>
     </div>
   </body>
 </html>

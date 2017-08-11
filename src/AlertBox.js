@@ -5,59 +5,56 @@ function AlertBox() {
   
   var _vm = null
   
-  var _cb = null
-  
-  var _message = ''
-  
   function load() {
   
     _vm = new Vue({
       el: '#alertbox',
       components: { alertbox },
-      computed: {
-        message:function() {
-          return _message
+      data: function(){
+        return {
+          title:'',
+          message:'',
+          buttons:[]
         }
       },
-      methods: {
-        confirm:function() {
-          
-          _cb && _cb()
-        },
-        cancel:function() {
-  
-          this.$el.style.visibility = 'hidden'
-        }
-      }
     })
   }
   
-  function show(bshow, message, cb) {
-    
-    _cb = cb
-    
-    _message = message
+  function hide() {
   
-    if (!_vm) {
-    
-      if (!bshow) return
+    if (_vm) {
       
-      load()
-      
-      return
-    }
-    
-    if (bshow) {
-  
-      _vm.$el.style.visibility = 'visible'
-    }
-    else {
-  
       _vm.$el.style.visibility = 'hidden'
     }
   }
   
+  function show(title, message, buttons) {
+    
+    if (!_vm) {
+    
+      load()
+      
+      _vm.title = title
+      
+      _vm.message = message
+      
+      _vm.buttons = buttons
+      
+      return
+    }
+  
+    _vm.title = title
+  
+    _vm.message = message
+  
+    _vm.buttons = buttons
+  
+    _vm.$el.style.visibility = 'visible'
+  }
+  
   this.show = show
+  
+  this.hide = hide
 }
 
 export { AlertBox as default }

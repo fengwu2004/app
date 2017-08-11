@@ -10,11 +10,12 @@ function ErrorTipView() {
   function load() {
     
     _vm = new Vue({
-      el:'#publicfacility',
+      el:'#errortip',
       components: { errortipview },
       data:function() {
         return {
-          message:_message
+          message:_message,
+          display:1
         }
       }
     })
@@ -25,23 +26,35 @@ function ErrorTipView() {
     _message = message
     
     if (!_vm) {
-      
-      if (visible) {
-        
-        load()
-      }
+  
+      load()
+  
+      setTimeout(function() {
+    
+        _vm.display = 0
+    
+      }, 1000)
       
       return
     }
+  
+    _vm.display = 1
     
-    if (visible) {
+    _vm.message = message
+  
+    _vm.$el.style.visibility = 'visible'
+    
+    setTimeout(function() {
+    
+      _vm.display = 0
       
-      _vm.$el.style.visibility = 'visible'
-    }
-    else {
+      setTimeout(function() {
+  
+        _vm.$el.style.visibility = 'hidden'
+        
+      }, 1000)
       
-      _vm.$el.style.visibility = 'hidden'
-    }
+    }, 1000)
   }
   
   this.show = show

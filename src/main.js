@@ -15,6 +15,7 @@ import BottomBar from './bottombar'
 import MarkWithBleView from './markwithble'
 import UpdateMarkerView from './updatemarkerview'
 import ErrorTipView from './errortipview'
+import ZoomView from './zoomview'
 
 var config = require('../config')
 
@@ -22,7 +23,7 @@ Vue.config.productionTip = false
 
 var regionId = '14980981254061534'
 
-indoorun.idrNetworkInstance.host = 'http://wx.indoorun.com/'
+// indoorun.idrNetworkInstance.host = 'http://192.168.0.103:8888/'
 
 var idrMapView = indoorun.idrMapView
 
@@ -51,6 +52,12 @@ var emptyUnits = []
 var targetUnit = null
 
 var startEmptyNavi = false
+
+var errortipview = new ErrorTipView()
+
+var alertboxview = null
+
+var zoomView = null
 
 function onSavePackingUnit(unit) {
   
@@ -283,21 +290,23 @@ map.initMap('2b497ada3b2711e4b60500163e0e2e6b', 'map', regionId)
 map.addEventListener(map.eventTypes.onFloorChangeSuccess, function(data) {
   
   floorListView.setCurrentFloor(data.floorId)
-  
-  map.doLocation(function(pos) {
-    
-    map.setCurrPos(pos)
-  })
 })
 
 function checkExit() {
   
-  showAlertBox(true, '是否结束本次导航', function() {
-    
+  var cancel = {name:'取消', callback:function() {
+  
+    alertboxview.hide()
+  }}
+  
+  var confirm = {name:'结束', callback:function() {
+  
     map.stopRoute()
-    
-    showAlertBox(false, '', null)
-  })
+  
+    alertboxview.hide()
+  }}
+  
+  showAlertBox('是否结束本次导航', null, [cancel, confirm])
 }
 
 var endMarker = null
@@ -387,6 +396,29 @@ map.addEventListener(map.eventTypes.onInitMapSuccess, function(regionEx) {
   showNormalBottomBar(true)
   
   document.title = regionEx.name
+  
+  zoomView = new ZoomView(map)
+  
+  zoomView.show()
+  
+  map.doLocation(function(pos) {
+    
+    map.setCurrPos(pos)
+    
+  }, function(errorId) {
+    
+    alert(errorId)
+    
+    if (errorId === 0) {
+      
+      var confirm = {name:'确定', callback:function() {
+        
+        alertboxview.hide()
+      }}
+      
+      showAlertBox('手机蓝牙未开启', '您可以尝试从手机设置中开启蓝牙设备', [confirm])
+    }
+  })
 })
 
 var findcarview = null
@@ -459,6 +491,13 @@ function onMarkUnitInMap() {
 }
 
 function onFindCar() {
+  
+  if (map.getUserPos() == null) {
+    
+    errortipview.show('定位失败，无法找车')
+    
+    return
+  }
 
   if (endMarker) {
   
@@ -491,6 +530,8 @@ function navigateToEmptySpace() {
   
   if (map.getUserPos() == null) {
   
+    errortipview.show('定位失败, 无法导航至空车位')
+    
     return
   }
   
@@ -512,6 +553,8 @@ function markWithBluetooth() {
   
   if (!pos) {
   
+    errortipview.show('定位失败，无法标记')
+    
     return
   }
   
@@ -530,16 +573,14 @@ function showFindFacilityView() {
   findFacilityView.show()
 }
 
-var alertboxdiv = null
+function showAlertBox(title, message, buttons) {
 
-function showAlertBox(bshow, message, confirmcb) {
-
-  if (!alertboxdiv && bshow) {
+  if (!alertboxview) {
   
-    alertboxdiv = new AlertBox()
+    alertboxview = new AlertBox()
   }
   
-  alertboxdiv && alertboxdiv.show(bshow, message, confirmcb)
+  alertboxview.show(title, message, buttons)
 }
 
 var bottomBar = null
