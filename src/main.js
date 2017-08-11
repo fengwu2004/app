@@ -14,10 +14,15 @@ import AlertBox from './AlertBox'
 import BottomBar from './bottombar'
 import MarkWithBleView from './markwithble'
 import UpdateMarkerView from './updatemarkerview'
+import ErrorTipView from './errortipview'
+
+var config = require('../config')
 
 Vue.config.productionTip = false
 
-var regionId = '14428254382730015'
+var regionId = '14980981254061534'
+
+indoorun.idrNetworkInstance.host = 'http://wx.indoorun.com/'
 
 var idrMapView = indoorun.idrMapView
 
@@ -38,6 +43,14 @@ var normalBottomBar = null
 var markWithBleView = null
 
 var updateMarkerView = null
+
+var emptySpaceTimer = null
+
+var emptyUnits = []
+
+var targetUnit = null
+
+var startEmptyNavi = false
 
 function onSavePackingUnit(unit) {
   
@@ -75,15 +88,20 @@ function showMarkWithBle(unit) {
       
       map.addEventListener(map.eventTypes.onMarkerClick, function(marker) {
         
+        if (marker !== endMarker) {
+        
+          return
+        }
+        
         map.centerPos(marker.position, false)
         
-        var pos = map.getScreenPos(marker.position)
-
-        showUpdateMarkerView(true, pos)
+        showUpdateMarkerView(true, marker)
         
-        map.addEventListener(map.eventTypes.onMapClick, function() {
+        map.addEventListener(map.eventTypes.onMapScroll, function() {
           
           showUpdateMarkerView(false, null)
+          
+          map.removeEventListener(map.eventTypes.onMapScroll)
         })
       })
     })
@@ -93,14 +111,14 @@ function showMarkWithBle(unit) {
 }
 
 var findEmptySpaceInfo = {
-  icon:'/static/kongwei.png',
+  icon:config.publicPath + '/static/kongwei.png',
   title:'空位引导',
   type:'0',
   cb:navigateToEmptySpace
 }
 
 var findByBleInfo = {
-  icon:'/static/biaoji.png',
+  icon:config.publicPath + '/static/biaoji.png',
   title:'蓝牙标记',
   type:'1',
   cb:function() {
@@ -109,7 +127,7 @@ var findByBleInfo = {
 }
 
 var findCarInfo = {
-  icon:'/static/zhaoche.png',
+  icon:config.publicPath + '/static/zhaoche.png',
   title:'找车',
   type:'2',
   cb:function() {
@@ -167,11 +185,94 @@ function showFloorListView(bshow) {
   floorListView && floorListView.show(bshow)
 }
 
+function checkTargetValid(unitId, unitList) {
+  
+  for (var i = 0; i < unitList.length; ++i) {
+  
+    if (unitList[i].id === unitId) {
+      
+      return true
+    }
+  }
+  
+  return false
+}
+
+function checkNeedUpdateNaivtarget(unitlist) {
+
+  if (!startEmptyNavi) {
+    
+    return
+  }
+  
+  if (!targetUnit || !checkTargetValid(targetUnit.id, unitlist)) {
+  
+    targetUnit = map.findNearUnit(map.getUserPos(), unitlist)
+    
+    map.doRoute(map.getUserPos(), targetUnit.getPos())
+  
+    endMarker && map.removeMarker(endMarker)
+  
+    endMarker = addEndMarker(targetUnit.getPos())
+  }
+}
+
+function doFindEmptySpace() {
+
+  var data = {regionId:map.getRegionId(), floorId:map.getFloorId()}
+  
+  var url = indoorun.idrNetworkInstance.host + 'chene/getSpaceUnitListOfFloor.html'
+  
+  indoorun.idrNetworkInstance.doAjax(url, data, function(res) {
+    
+    emptyUnits.length = 0
+    
+    var spaceUnitList = res.data
+    
+    for (var i = 0; i < spaceUnitList.length; ++i) {
+  
+      var unit = new indoorun.idrUnit(spaceUnitList[i])
+  
+      emptyUnits.push(unit)
+    }
+    
+    map.updateUnitsColor(emptyUnits, 0x8aef99)
+    
+    checkNeedUpdateNaivtarget(emptyUnits)
+    
+  }, function() {
+  
+  
+  })
+}
+
 function showEmptySpaceView(bshow) {
   
   if (!emptySpaceView && bshow) {
   
-    emptySpaceView = new EmptySpaceView(map)
+    emptySpaceView = new EmptySpaceView(function(finding) {
+  
+      if (finding) {
+  
+        doFindEmptySpace()
+  
+        emptySpaceTimer = setInterval(doFindEmptySpace, 10000)
+  
+        emptySpaceView.doFinding(true)
+      }
+      else {
+  
+        clearInterval(emptySpaceTimer)
+  
+        emptySpaceTimer = null
+  
+        emptySpaceView.doFinding(false)
+        
+        map.clearFloorUnitsColor(true)
+  
+        emptyUnits.length = 0
+      }
+    })
   }
   
   emptySpaceView && emptySpaceView.show(bshow)
@@ -210,6 +311,21 @@ map.addEventListener(map.eventTypes.onRouterFinish, function() {
   map.removeMarker(endMarker)
   
   endMarker = null
+  
+  if (startEmptyNavi) {
+  
+    startEmptyNavi = false
+  
+    clearInterval(emptySpaceTimer)
+  
+    emptySpaceTimer = null
+  
+    emptySpaceView.doFinding(false)
+  
+    map.clearFloorUnitsColor(true)
+  
+    emptyUnits.length = 0
+  }
 })
 
 function addEndMarker(pos) {
@@ -249,6 +365,8 @@ map.addEventListener(map.eventTypes.onRouterSuccess, function(data) {
   showBottomBar(false)
   
   showNavigateBottombar(true, data.path, checkExit)
+  
+  map.birdLook()
 })
 
 map.addEventListener(map.eventTypes.onInitMapSuccess, function(regionEx) {
@@ -267,6 +385,8 @@ map.addEventListener(map.eventTypes.onInitMapSuccess, function(regionEx) {
   })
   
   showNormalBottomBar(true)
+  
+  document.title = regionEx.name
 })
 
 var findcarview = null
@@ -326,7 +446,7 @@ function onMarkUnitInMap() {
   
   showNormalBottomBar(false)
   
-  showBottomBar(true)
+  showBottomBar(true, '长按车位进行选择')
   
   map.addEventListener('onMapLongPress', function(pos) {
   
@@ -334,7 +454,7 @@ function onMarkUnitInMap() {
   
     map.removeEventListener('onMapLongPress')
   
-    showBottomBar(false)
+    showBottomBar(false, '')
   })
 }
 
@@ -368,7 +488,22 @@ function showFindCarView() {
 }
 
 function navigateToEmptySpace() {
+  
+  if (map.getUserPos() == null) {
+  
+    return
+  }
+  
+  startEmptyNavi = true
 
+  if (!emptySpaceTimer) {
+  
+    doFindEmptySpace()
+  
+    emptySpaceTimer = setInterval(doFindEmptySpace, 10000)
+  
+    emptySpaceView.doFinding(true)
+  }
 }
 
 function markWithBluetooth() {
@@ -409,22 +544,63 @@ function showAlertBox(bshow, message, confirmcb) {
 
 var bottomBar = null
 
-function showBottomBar(bshow) {
+function showBottomBar(bshow, message) {
   
   if (!bottomBar && bshow) {
   
     bottomBar = new BottomBar()
   }
   
-  bottomBar && bottomBar.show(bshow)
+  bottomBar && bottomBar.show(bshow, message)
 }
 
-function showUpdateMarkerView(show, pos) {
+function updateMarkerPos() {
+  
+  showBottomBar(true, '点击车位进行选择')
+  
+  showNormalBottomBar(false)
+  
+  map.addEventListener(map.eventTypes.onUnitClick, function(unit) {
+  
+    map.updateMarkerLocation(endMarker, unit.getPos())
+  
+    showBottomBar(false, '')
+    
+    showNormalBottomBar(true)
+    
+    map.removeEventListener(map.eventTypes.onUnitClick)
+  })
+}
+
+function deleteMarker() {
+  
+  map.removeEventListener(map.eventTypes.onMarkerClick)
+
+  map.removeMarker(endMarker)
+  
+  endMarker = null
+}
+
+function sharePosition() {
+  
+  var ua = navigator.userAgent;
+  
+  if(ua.match(/iPhone|iPod/i) != null){
+    
+    setTimeout("javascript:location.href='http://a.app.qq.com/o/simple.jsp?pkgname=com.yellfun.yellfunchene'", 0);
+    
+  } else if (ua.match(/Android/i) != null){
+    
+    window.location.href="http://a.app.qq.com/o/simple.jsp?pkgname=com.yellfun.yellfunchene";
+  }
+}
+
+function showUpdateMarkerView(show, marker) {
 
   if (!updateMarkerView && show) {
   
-    updateMarkerView = new UpdateMarkerView()
+    updateMarkerView = new UpdateMarkerView(deleteMarker, updateMarkerPos, sharePosition)
   }
   
-  updateMarkerView && updateMarkerView.show(show, pos)
+  updateMarkerView && updateMarkerView.show(show, marker, map)
 }

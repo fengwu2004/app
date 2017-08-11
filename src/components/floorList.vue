@@ -66,8 +66,6 @@
     return null
   }
 
-  console.log('记载')
-
   export default {
     name :'floorlistdiv',
     props: ['floorlist', 'selectfloorid'],
@@ -97,13 +95,13 @@
   .fadein {
     visibility: visible;
     opacity: 1;
-    transition: opacity 1s linear;
+    transition: opacity 0.5s linear;
   }
 
   .fadeout {
     visibility: hidden;
     opacity: 0;
-    transition: visibility 0s 2s, opacity 1s linear;
+    transition: visibility 0s 0.5s, opacity 0.5s linear;
   }
 
   .currentName {
@@ -122,6 +120,7 @@
     height: 2.3rem;
     line-height: 2.3rem;
     text-align: center;
+    padding: 3px 0;
   }
 
   .selected{

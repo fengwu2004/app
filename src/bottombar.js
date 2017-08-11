@@ -10,10 +10,15 @@ function BottomBar() {
     _vm = new Vue({
       el:'#bottombar',
       components:{ bottombar },
+      data: function() {
+        return {
+          message:''
+        }
+      }
     })
   }
   
-  function show(bShow) {
+  function show(bShow, message) {
     
     if (!_vm) {
       
@@ -24,12 +29,16 @@ function BottomBar() {
   
       load()
       
+      _vm.message = message
+      
       return
     }
     
     if (bShow) {
     
       _vm.$el.style.visibility = 'visible'
+  
+      _vm.message = message
     }
     else {
   

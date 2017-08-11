@@ -1,14 +1,14 @@
 <template>
   <div class="pointRev" v-bind:style="{left:x,top:y}">
     <div class="pointDelete">
-      <img src="../assets/pointDelete.png">
+      <img src="../assets/pointDelete.png" v-on:click="onDelete">
     </div>
     <div class="box1">
       <div class="pointCha">
-        <img src="../assets/pointCha.png">
+        <img src="../assets/pointCha.png" v-on:click="onChangePos">
       </div>
       <div class="sharePoint">
-        <img src="../assets/pointShare.png">
+        <img src="../assets/pointShare.png" v-on:click="onShare">
       </div>
     </div>
   </div>
@@ -17,7 +17,21 @@
 <script>
   export default {
     name: 'updatemarkerview',
-    props:['x', 'y']
+    props:['x', 'y'],
+    methods: {
+      onDelete:function() {
+
+        this.$emit('ondelete', '')
+      },
+      onChangePos:function() {
+
+        this.$emit('onchangepos', '')
+      },
+      onShare:function() {
+
+        this.$emit('onshare', '')
+      },
+    }
   }
 
 </script>

@@ -11,7 +11,6 @@ export default {
   props:['data'],
   methods: {
     onclick:function() {
-      console.log('按了')
       this.data.cb && this.data.cb()
     }
   }

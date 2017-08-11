@@ -1,12 +1,13 @@
 <template>
   <div>
-    <p>长按车位进行选择</p>
+    <p>{{ message }}</p>
   </div>
 </template>
 
 <script>
 export default {
   name: 'bottombar',
+  props:['message']
 }
 </script>
 

@@ -1,11 +1,11 @@
 import Vue from 'vue'
 import emptyspace from './components/emptyspace.vue'
 
-function EmptySpaceView(map) {
+function EmptySpaceView(callback) {
   
   var _vm = null
   
-  var _map = map
+  var _callback = callback
   
   function load() {
     
@@ -13,9 +13,9 @@ function EmptySpaceView(map) {
       el:'#emptyspace',
       components: { emptyspace },
       methods: {
-        onFindEmptySpace:function onFindEmptySpace(value) {
-      
-      
+        onFindEmptySpace:function() {
+          
+          _callback && _callback(!this.doFind)
         }
       },
       data: function() {
@@ -27,7 +27,7 @@ function EmptySpaceView(map) {
   }
   
   function show(visible) {
-  
+    
     if (!_vm) {
     
       if (visible) {
@@ -48,7 +48,14 @@ function EmptySpaceView(map) {
     }
   }
   
+  function doFinding(value) {
+    
+    _vm.doFind = value
+  }
+  
   this.show = show
+  
+  this.doFinding = doFinding
 }
 
 export { EmptySpaceView as default }

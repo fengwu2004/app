@@ -38,9 +38,7 @@
 
     console.log(self.carNumber)
 
-    var host = "http://192.168.0.108:8888/"
-
-    const url = host + 'chene/getParkingPlaceUnitByCarNo.html'
+    const url = indoorun.idrNetworkInstance.host + 'chene/getParkingPlaceUnitByCarNo.html'
 
     var data = {
       'regionId': self.map.getRegionId(),
