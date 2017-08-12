@@ -7,7 +7,7 @@ var dev_assetsPublicPath = '/'
 module.exports = {
   build: {
     env: require('./prod.env'),
-    index: path.resolve(__dirname, '../webapp/index.html'),
+    index: path.resolve(__dirname, '../webapp/index.htm'),
     assetsRoot: path.resolve(__dirname, '../webapp'),
     assetsSubDirectory: 'static',
     assetsPublicPath:build_assetsPublicPath,

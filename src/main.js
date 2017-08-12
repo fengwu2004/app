@@ -407,8 +407,6 @@ map.addEventListener(map.eventTypes.onInitMapSuccess, function(regionEx) {
     
   }, function(errorId) {
     
-    alert(errorId)
-    
     if (errorId === 0) {
       
       var confirm = {name:'确定', callback:function() {
