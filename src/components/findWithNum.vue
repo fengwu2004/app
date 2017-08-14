@@ -6,12 +6,13 @@
       <img class="tag" src="../assets/car.png">
       <p class="title">车牌找车</p>
       <p class="tip">请输入您的车牌号</p>
-      <input v-model="carNumber" placeholder="例：粤B NB001">
+      <input v-model="carnumber" placeholder="例：粤B NB001">
       <p class="errorTip" style="visibility: hidden;">该车辆不在此停车场，请确认车牌号!</p>
       <div class="confirmBtn" v-on:click="onConfirm()">确定</div>
       <h5><span>  or  </span></h5>
       <div class="cancelBtn" v-on:click="onCancel()">输入车位号找车</div>
       <br>
+
     </div>
   </div>
 </template>
@@ -36,13 +37,13 @@
 
   function onConfirm(self) {
 
-    console.log(self.carNumber)
+    console.log(self.carnumber)
 
     const url = indoorun.idrNetworkInstance.host + 'chene/getParkingPlaceUnitByCarNo.html'
 
     var data = {
       'regionId': self.map.getRegionId(),
-      'carNo': self.carNumber,
+      'carNo': self.carnumber,
       'floorId': self.map.getFloorId(),
     }
 
@@ -63,10 +64,8 @@
   export default {
     name:'findwithnum',
     props:['map'],
-    data:function() {
-      return {
-        carNumber:''
-      }
+    data:{
+      carnumber:''
     },
     methods: {
       onClose:onClose,

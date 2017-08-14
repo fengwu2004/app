@@ -290,6 +290,23 @@ map.initMap('2b497ada3b2711e4b60500163e0e2e6b', 'map', regionId)
 map.addEventListener(map.eventTypes.onFloorChangeSuccess, function(data) {
   
   floorListView.setCurrentFloor(data.floorId)
+  
+  map.doLocation(function(pos) {
+    
+    map.setCurrPos(pos)
+    
+  }, function(errorId) {
+    
+    if (errorId === 0) {
+      
+      var confirm = {name:'确定', callback:function() {
+        
+        alertboxview.hide()
+      }}
+      
+      showAlertBox('手机蓝牙未开启', '您可以尝试从手机设置中开启蓝牙设备', [confirm])
+    }
+  })
 })
 
 function checkExit() {
@@ -400,23 +417,6 @@ map.addEventListener(map.eventTypes.onInitMapSuccess, function(regionEx) {
   zoomView = new ZoomView(map)
   
   zoomView.show()
-  
-  map.doLocation(function(pos) {
-    
-    map.setCurrPos(pos)
-    
-  }, function(errorId) {
-    
-    if (errorId === 0) {
-      
-      var confirm = {name:'确定', callback:function() {
-        
-        alertboxview.hide()
-      }}
-      
-      showAlertBox('手机蓝牙未开启', '您可以尝试从手机设置中开启蓝牙设备', [confirm])
-    }
-  })
 })
 
 var findcarview = null
@@ -490,12 +490,12 @@ function onMarkUnitInMap() {
 
 function onFindCar() {
   
-  if (map.getUserPos() == null) {
-    
-    errortipview.show('定位失败，无法找车')
-    
-    return
-  }
+  // if (map.getUserPos() == null) {
+  //
+  //   errortipview.show('定位失败，无法找车')
+  //
+  //   return
+  // }
 
   if (endMarker) {
   
