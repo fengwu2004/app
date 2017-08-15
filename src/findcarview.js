@@ -4,8 +4,9 @@ import findwithunit from './components/findWithUnit.vue'
 
 const findtype_withnumber = 0
 const findtype_withunit = 1
+const findtype_none = 2
 
-function FindCarView(map, findUnitsCallBack, markUnitInMapCallBack) {
+function FindCarView(map, findUnitsCallBack, markUnitInMapCallBack, findwithnocallback) {
   
   var _vm = null
   
@@ -17,6 +18,8 @@ function FindCarView(map, findUnitsCallBack, markUnitInMapCallBack) {
   
   var _markUnitInMapCallBack = markUnitInMapCallBack
   
+  var _findwithnocallback = findwithnocallback
+  
   function load() {
     
     _vm = new Vue({
@@ -26,6 +29,8 @@ function FindCarView(map, findUnitsCallBack, markUnitInMapCallBack) {
         return {
           map:_map,
           type:_type,
+          showerrorincarno:'hidden',
+          showerrorinunit:'hidden',
           findbynum:findtype_withnumber,
           findbyunit:findtype_withunit,
         }
@@ -42,6 +47,10 @@ function FindCarView(map, findUnitsCallBack, markUnitInMapCallBack) {
         onFindUnits:function(units) {
   
           _findUnitsCallBack && _findUnitsCallBack(units)
+        },
+        onFindByCarNo:function(carNo) {
+  
+          _findwithnocallback && _findwithnocallback(carNo)
         }
       }
     })
@@ -61,7 +70,33 @@ function FindCarView(map, findUnitsCallBack, markUnitInMapCallBack) {
     _vm.type = type
   }
   
+  function hide() {
+  
+    if (_vm) {
+  
+      _vm.type = findtype_none
+    }
+  }
+  
+  this.showErrorOfFindByCarNo = function() {
+    
+    if (_vm) {
+      
+      _vm.showerrorincarno = 'visible'
+    }
+  }
+  
+  this.showErrorOfFindByUnit = function() {
+    
+    if (_vm) {
+      
+      _vm.showerrorinunit = 'visible'
+    }
+  }
+  
   this.show = show
+  
+  this.hide = hide
 }
 
 export { FindCarView as default }

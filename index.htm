@@ -23,7 +23,7 @@
       <floorlistdiv v-bind:floorlist="floorList" v-bind:selectfloorid="currentFloorId" v-on:onselect="onSelect"></floorlistdiv>
     </div>
     <div id="findCar">
-      <findwithnum v-show="type === findbynum" v-bind:map="map" v-on:onclose="onClose"></findwithnum>
+      <findwithnum v-bind:showerror="showerrorincarno" v-show="type === findbynum" v-bind:map="map" v-on:onclose="onClose" v-on:findbycarno="onFindByCarNo"></findwithnum>
       <findwithunit v-show="type === findbyunit" v-on:onfindunits="onFindUnits" v-bind:map="map" v-on:onclose="onClose" v-on:onmarkinmap="onMarkInMap"></findwithunit>
     </div>
     <div id="markwithble">

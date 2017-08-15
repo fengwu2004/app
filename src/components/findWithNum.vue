@@ -6,8 +6,8 @@
       <img class="tag" src="../assets/car.png">
       <p class="title">车牌找车</p>
       <p class="tip">请输入您的车牌号</p>
-      <input v-model="carnumber" placeholder="例：粤B NB001">
-      <p class="errorTip" style="visibility: hidden;">该车辆不在此停车场，请确认车牌号!</p>
+      <input placeholder="例：粤B NB001">
+      <p class="errorTip" v-bind:style="{visibility:showerror}">该车辆不在此停车场，请确认车牌号!</p>
       <div class="confirmBtn" v-on:click="onConfirm()">确定</div>
       <h5><span>  or  </span></h5>
       <div class="cancelBtn" v-on:click="onCancel()">输入车位号找车</div>
@@ -18,10 +18,6 @@
 </template>
 
 <script>
-
-  import indoorun from '../../../indoorunMap/map.js'
-
-  const idrNetworkInstance = indoorun.idrNetworkInstance
 
   function onClose() {
 
@@ -35,48 +31,22 @@
     this.$emit('onclose', 1)
   }
 
-  function onConfirm(self) {
-
-    console.log(self.carnumber)
-
-    const url = indoorun.idrNetworkInstance.host + 'chene/getParkingPlaceUnitByCarNo.html'
-
-    var data = {
-      'regionId': self.map.getRegionId(),
-      'carNo': self.carnumber,
-      'floorId': self.map.getFloorId(),
-    }
-
-    idrNetworkInstance.doAjax(url, data, function(res) {
-
-      var data = res.data
-
-      var unit = new indoorun.idrUnit(data.parkingUnit)
-
-      self.map.doRoute(self.map.getUserPos(), unit.getPos())
-
-    }, function(res) {
-
-
-    })
-  }
-
   export default {
     name:'findwithnum',
-    props:['map'],
-    data:{
-      carnumber:''
+    props:['map', 'showerror'],
+    data: function () {
+      return {
+        carnumber:""
+      }
     },
     methods: {
       onClose:onClose,
       onConfirm:function() {
 
-        this.onClose()
-
-        onConfirm(this)
+        this.$emit('findbycarno', this.carnumber)
       },
       onCancel:onFindbyUnit,
-    }
+    },
 }
 
 </script>
@@ -164,6 +134,8 @@
     padding: 1px 10px;
     font-weight: 100;
     text-align: center;
+    /*user-select: text;*/
+    -webkit-user-select:text;
   }
 
   .errorTip {

@@ -9,8 +9,8 @@
       <div class="floors">
         <div v-for="floor in floorlist" v-bind:key="floor.id" class="floor" v-bind:class="getFloorStyle(floor.id)" v-on:click="onSelectFloor(floor.id)">{{ floor.name }}</div>
       </div>
-      <input v-model="unitName" placeholder="例：026">
-      <p class="errortip" v-bind:style="{visibility:errortipVisible}">输入有误，请重新输入您的车位号!</p>
+      <input v-model="unitName" v-on:focus="onFocuse" placeholder="例：026">
+      <p class="errortip" v-bind:style="{visibility:showerror}">输入有误，请重新输入您的车位号!</p>
       <div class="confirmBtn" v-on:click="onConfirm">确定</div>
       <h5><span>  or  </span></h5>
       <div class="cancelBtn" v-on:click="onCancel()">地图标记</div>
@@ -70,32 +70,42 @@
     }
   }
 
+  function onFocuse() {
+
+    this.findError = false
+  }
+
   export default {
     name:'findwithunit',
     props:['map'],
     data:function() {
       return {
+        findError: false,
         unitName:'',
-        findError:false,
         floorlist:this.map.regionEx.floorList,
         selectedFloorId:this.map.getFloorId()
       }
-    },
-    computed:{
-      errortipVisible:function() {
-        if (this.findError) {
-          return 'visible'
-        }
-        return 'hidden'
-      },
-
     },
     methods:{
       onClose:onClose,
       onCancel:onCancel,
       onConfirm:onConfirm,
       onSelectFloor:onSelectFloor,
-      getFloorStyle:getFloorStyle
+      getFloorStyle:getFloorStyle,
+      onFocuse:onFocuse
+    },
+    computed:{
+      showerror:function() {
+
+        if (this.findError) {
+
+          return 'visible'
+        }
+        else {
+
+          return 'hidden'
+        }
+      }
     }
   }
 </script>
@@ -193,6 +203,8 @@
     padding: 1px 10px;
     font-weight: 100;
     text-align: center;
+    /*user-select: text;*/
+    -webkit-user-select:text;
   }
 
   input::placeholder {

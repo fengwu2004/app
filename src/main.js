@@ -29,6 +29,8 @@ var idrMapView = indoorun.idrMapView
 
 var map = new idrMapView()
 
+map.publicPath = config.publicPath
+
 var floorListView = null
 
 var emptySpaceView = null
@@ -358,7 +360,7 @@ function addEndMarker(pos) {
   
   var IDREndMarker = indoorun.idrMapMarker.IDREndMarker
   
-  var endMarker = new IDREndMarker(pos, '/static/markericon/end.png')
+  var endMarker = new IDREndMarker(pos, config.publicPath + '/static/markericon/end.png')
   
   map.addMarker(endMarker)
   
@@ -444,7 +446,7 @@ function onFindTargetUnits(units) {
   
     var IDRMapMarker = indoorun.idrMapMarker.IDRMapMarker
     
-    var marker = new IDRMapMarker(units[i].getPos(), '/static/markericon/temppoint.png')
+    var marker = new IDRMapMarker(units[i].getPos(), config.publicPath + '/static/markericon/temppoint.png')
     
     map.addMarker(marker)
   
@@ -507,6 +509,32 @@ function onFindCar() {
   }
 }
 
+function onFindByCarNo(carNo) {
+  
+  const url = indoorun.idrNetworkInstance.host + 'chene/getParkingPlaceUnitByCarNo.html'
+  
+  var data = {
+    'regionId': map.getRegionId(),
+    'carNo': carNo,
+    'floorId': map.getFloorId(),
+  }
+  
+  indoorun.idrNetworkInstance.doAjax(url, data, function(res) {
+    
+    alert(JSON.stringify(res))
+    
+    var data = res.data
+    
+    var unit = new indoorun.idrUnit(data.parkingUnit)
+    
+    self.map.doRoute(self.map.getUserPos(), unit.getPos())
+    
+  }, function() {
+  
+    findcarview.showErrorOfFindByCarNo()
+  })
+}
+
 function showFindCarView() {
   
   if (!findcarview) {
@@ -518,7 +546,8 @@ function showFindCarView() {
     }, function() {
     
       onMarkUnitInMap()
-    })
+      
+    }, onFindByCarNo)
   }
   
   findcarview.show(0)
