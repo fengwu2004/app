@@ -10,7 +10,7 @@
         <div v-for="floor in floorlist" v-bind:key="floor.id" class="floor" v-bind:class="getFloorStyle(floor.id)" v-on:click="onSelectFloor(floor.id)">{{ floor.name }}</div>
       </div>
       <input v-model="unitName" v-on:focus="onFocuse" placeholder="例：026">
-      <p class="errortip" v-bind:style="{visibility:showerror}">输入有误，请重新输入您的车位号!</p>
+      <p class="errortip" v-bind:style="{visibility:errorshow}">输入有误，请重新输入您的车位号!</p>
       <div class="confirmBtn" v-on:click="onConfirm">确定</div>
       <h5><span>  or  </span></h5>
       <div class="cancelBtn" v-on:click="onCancel()">地图标记</div>
@@ -20,34 +20,6 @@
 </template>
 
 <script>
-
-  function onClose() {
-
-    this.$emit('onclose', 2)
-  }
-
-  function onCancel() {
-
-    this.onClose()
-
-    this.$emit('onmarkinmap')
-  }
-
-  function onConfirm() {
-
-    var units = this.map.findUnitWithName(this.selectedFloorId, this.unitName)
-
-    if (!units) {
-
-      this.findError = true
-    }
-    else {
-
-      this.onClose()
-
-      this.$emit('onfindunits', units)
-    }
-  }
 
   function onSelectFloor(floorId) {
 
@@ -70,41 +42,48 @@
     }
   }
 
-  function onFocuse() {
-
-    this.findError = false
-  }
-
   export default {
     name:'findwithunit',
-    props:['map'],
+    props:['map', 'errorshow', 'floorlist', 'initfloorid'],
     data:function() {
       return {
-        findError: false,
         unitName:'',
-        floorlist:this.map.regionEx.floorList,
-        selectedFloorId:this.map.getFloorId()
+        selectedFloorId:this.$props.initfloorid
       }
     },
     methods:{
-      onClose:onClose,
-      onCancel:onCancel,
-      onConfirm:onConfirm,
-      onSelectFloor:onSelectFloor,
-      getFloorStyle:getFloorStyle,
-      onFocuse:onFocuse
-    },
-    computed:{
-      showerror:function() {
+      onClose:function() {
 
-        if (this.findError) {
+        this.$emit('close')
+      },
+      onConfirm:function() {
 
-          return 'visible'
+        this.$emit('confirm', this.unitName)
+      },
+      onCancel:function() {
+
+        this.$emit('cancel')
+      },
+      getFloorStyle:function(floorId) {
+
+        if (floorId === this.selectedFloorId) {
+
+          return 'floor floorSelected'
         }
         else {
 
-          return 'hidden'
+          return 'floor'
         }
+      },
+      onSelectFloor:function(floorId) {
+
+        this.selectedFloorId = floorId
+
+        this.$emit('selectfloor', floorId)
+      },
+      onFocuse:function() {
+
+        this.errorshow = 'hidden'
       }
     }
   }

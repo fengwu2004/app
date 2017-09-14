@@ -7,7 +7,7 @@
       <p class="title">车牌找车</p>
       <p class="tip">请输入您的车牌号</p>
       <input placeholder="例：粤B NB001">
-      <p class="errorTip" v-bind:style="{visibility:showerror}">该车辆不在此停车场，请确认车牌号!</p>
+      <p class="errorTip" v-bind:style="{visibility:errorshow}">该车辆不在此停车场，请确认车牌号!</p>
       <div class="confirmBtn" v-on:click="onConfirm()">确定</div>
       <h5><span>  or  </span></h5>
       <div class="cancelBtn" v-on:click="onCancel()">输入车位号找车</div>
@@ -18,33 +18,27 @@
 
 <script>
 
-  function onClose() {
-
-    this.$emit('onclose', '0')
-  }
-
-  function onFindbyUnit() {
-
-    this.onClose()
-
-    this.$emit('onclose', 1)
-  }
-
   export default {
     name:'findwithnum',
-    props:['map', 'showerror'],
+    props:['map', 'errorshow'],
     data: function () {
       return {
         carnumber:""
       }
     },
     methods: {
-      onClose:onClose,
+      onClose:function() {
+
+        this.$emit('close')
+      },
       onConfirm:function() {
 
-        this.$emit('findbycarno', this.carnumber)
+        this.$emit('confirm', this.carnumber)
       },
-      onCancel:onFindbyUnit,
+      onCancel:function() {
+
+        this.$emit('cancel')
+      },
     },
 }
 

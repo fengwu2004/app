@@ -6,7 +6,7 @@ const findtype_withnumber = 0
 const findtype_withunit = 1
 const findtype_none = 2
 
-function FindCarView(map, findUnitsCallBack, markUnitInMapCallBack, findwithnocallback) {
+function FindCarView(map) {
   
   var _vm = null
   

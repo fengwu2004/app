@@ -24,9 +24,11 @@
     <div id="floorList">
       <floorlistdiv v-bind:floorlist="floorList" v-bind:selectfloorid="currentFloorId" v-on:onselect="onSelect"></floorlistdiv>
     </div>
-    <div id="findCar">
-      <findwithnum v-bind:showerror="showerrorincarno" v-show="type === findbynum" v-bind:map="map" v-on:onclose="onClose" v-on:findbycarno="onFindByCarNo"></findwithnum>
-      <findwithunit v-show="type === findbyunit" v-on:onfindunits="onFindUnits" v-bind:map="map" v-on:onclose="onClose" v-on:onmarkinmap="onMarkInMap"></findwithunit>
+    <div id="findwithnum">
+      <findwithnum v-bind:errorshow="errorshow" v-on:close="onClose" v-on:confirm="onConfirm" v-on:cancel="onCancel"></findwithnum>
+    </div>
+    <div id="findwithunit">
+      <findwithunit v-bind:errorshow="errorshow" v-on:selectfloor="onSelectFloor" v-on:confirm="onConfirm" v-bind:initfloorid="currentFloorId" v-on:close="onClose" v-on:cancel="onCancel"></findwithunit>
     </div>
     <div id="markwithble">
       <markwithble v-bind:name="name" v-on:confirm="onConfirm" v-on:close="onClose"></markwithble>
@@ -54,6 +56,9 @@
     </div>
     <div id="errortip">
       <errortipview v-bind:message="message" v-bind:opacity="display"></errortipview>
+    </div>
+    <div id="findcarbtn">
+      <findcarbtn v-on:onfindunit="onFindUnit" v-on:onfindcar="onFindCar"></findcarbtn>
     </div>
     <div id="zoom">
       <zoom v-bind:map="map"></zoom>
