@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <img class="quit" src="../assets/quit.png" v-on:click="exit(false)"/>
-    <div class="route" v-for="router in routers" v-bind:key="router.id"><span>{{ router.name }}</span><img src="../assets/jiantou.png"/></div>
+    <div class="route" v-for="router in routers" v-bind:key="router.id"><span v-on:click="clickFloor(router.id)">{{ router.name }}</span><img src="../assets/jiantou.png"/></div>
     <span>终</span>
   </div>
 </template>
@@ -27,9 +27,8 @@
       exit:function() {
         this.$emit('onexit', true)
       },
-      click:function(value) {
-        var el = event.target
-        el.disabledenable = true
+      clickFloor:function(floorId) {
+        this.$emit('showfloor', floorId)
       }
     }
   }
@@ -45,7 +44,7 @@
     position: absolute;
     bottom: 0px;
     left: 0;
-    background-color: #0b79f2;
+    background-color: #18202a;
     text-align: center;
   }
 

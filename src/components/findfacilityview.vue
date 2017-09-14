@@ -148,7 +148,7 @@
 
   .facility {
 
-    flex:1;
+    flex:1 1 30%;
   }
 
 </style>

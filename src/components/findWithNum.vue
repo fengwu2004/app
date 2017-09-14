@@ -12,7 +12,6 @@
       <h5><span>  or  </span></h5>
       <div class="cancelBtn" v-on:click="onCancel()">输入车位号找车</div>
       <br>
-
     </div>
   </div>
 </template>
@@ -134,8 +133,8 @@
     padding: 1px 10px;
     font-weight: 100;
     text-align: center;
-    /*user-select: text;*/
-    -webkit-user-select:text;
+    user-select: text !important;
+    -webkit-user-select:text !important;
   }
 
   .errorTip {

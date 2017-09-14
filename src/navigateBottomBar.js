@@ -41,6 +41,10 @@ function Navigatebottombar(map) {
         onStopNavigate:function() {
   
           _cb && _cb()
+        },
+        onShowSelectFloor:function(value) {
+        
+          _map.changeFloor(value)
         }
       }
     })

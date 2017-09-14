@@ -13,12 +13,33 @@
   export default {
     name : 'zoom',
     props:['map'],
+    data: function() {
+      return {
+        _time:null
+      }
+    },
     methods: {
       zoomout:function() {
-        this.map.zoom(0.9)
+
+        var time = (new Date()).getTime()
+
+        if (!this._time || time - this._time > 1000) {
+
+          this.map.zoom(0.75)
+
+          this._time = time
+        }
       },
       zoomin:function() {
-        this.map.zoom(1.1)
+
+        var time = (new Date()).getTime()
+
+        if (!this._time || time - this._time > 1000) {
+
+          this.map.zoom(1.35)
+
+          this._time = time
+        }
       },
     }
   }

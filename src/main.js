@@ -23,8 +23,6 @@ Vue.config.productionTip = false
 
 var regionId = '14980981254061534'
 
-// indoorun.idrNetworkInstance.host = 'http://192.168.0.103:8888/'
-
 var idrMapView = indoorun.idrMapView
 
 var map = new idrMapView()
@@ -61,6 +59,8 @@ var alertboxview = null
 
 var zoomView = null
 
+indoorun.idrDebug.showDebugInfo(true)
+
 function onSavePackingUnit(unit) {
   
   var pos = unit.getPos()
@@ -85,7 +85,36 @@ function onSavePackingUnit(unit) {
   })
 }
 
+function enableClickMarker() {
+  
+  map.addEventListener(map.eventTypes.onMarkerClick, function(marker) {
+    
+    if (marker.id != endMarker.id) {
+      
+      return
+    }
+    
+    map.centerPos(marker.position, false)
+    
+    showUpdateMarkerView(true, marker)
+    
+    map.addEventListener(map.eventTypes.onMapScroll, function() {
+      
+      showUpdateMarkerView(false, null)
+      
+      map.removeEventListener(map.eventTypes.onMapScroll)
+    })
+  })
+}
+
 function showMarkWithBle(unit) {
+  
+  if (endMarker) {
+    
+    map.centerPos(endMarker.position, false)
+  
+    return
+  }
   
   if (!markWithBleView) {
   
@@ -93,26 +122,9 @@ function showMarkWithBle(unit) {
     
       onSavePackingUnit(parkingUnit)
       
-      endMarker = addEndMarker(parkingUnit.getPos())
-      
-      map.addEventListener(map.eventTypes.onMarkerClick, function(marker) {
-        
-        if (marker !== endMarker) {
-        
-          return
-        }
-        
-        map.centerPos(marker.position, false)
-        
-        showUpdateMarkerView(true, marker)
-        
-        map.addEventListener(map.eventTypes.onMapScroll, function() {
-          
-          showUpdateMarkerView(false, null)
-          
-          map.removeEventListener(map.eventTypes.onMapScroll)
-        })
-      })
+      endMarker = addCarMarker(parkingUnit.getPos())
+  
+      enableClickMarker()
     })
   }
   
@@ -287,28 +299,77 @@ function showEmptySpaceView(bshow) {
   emptySpaceView && emptySpaceView.show(bshow)
 }
 
+var gmtime = new Date().getTime()
+
 map.initMap('2b497ada3b2711e4b60500163e0e2e6b', 'map', regionId)
+
+var getSaveUnit = false
 
 map.addEventListener(map.eventTypes.onFloorChangeSuccess, function(data) {
   
   floorListView.setCurrentFloor(data.floorId)
   
-  map.doLocation(function(pos) {
+  if (!getSaveUnit) {
     
-    map.setCurrPos(pos)
-    
-  }, function(errorId) {
-    
-    if (errorId === 0) {
+    indoorun.idrNetworkInstance.getMarkedUnit(map.getRegionId(), function(res) {
       
-      var confirm = {name:'确定', callback:function() {
+      if (res.code === 'success') {
         
+        endMarker = addCarMarker({x:res.data.svgX, y:res.data.svgY, floorId:res.data.floorId})
+  
+        enableClickMarker()
+      }
+      
+    }, null)
+  
+    getSaveUnit = true
+  }
+  
+  indoorun.idrDebug.showDebugInfo(true)
+  
+  indoorun.idrDebug.debugInfo('加载时间:' + (new Date().getTime() - gmtime).toString())
+  
+  map.doLocation(function(pos) {
+
+    map.setCurrPos(pos)
+
+  }, function(errorId) {
+
+    if (errorId === 0) {
+
+      var confirm = {name:'确定', callback:function() {
+
         alertboxview.hide()
       }}
-      
+
       showAlertBox('手机蓝牙未开启', '您可以尝试从手机设置中开启蓝牙设备', [confirm])
     }
   })
+})
+
+map.addEventListener(map.eventTypes.onNaviStatusUpdate, function(status) {
+
+  if (!status.validate) {
+  
+    return
+  }
+  
+  if (status.goalDist < 150) {
+  
+    var cancel = {name:'取消', callback:function() {
+    
+      alertboxview.hide()
+    }}
+  
+    var confirm = {name:'确定', callback:function() {
+    
+      alertboxview.hide()
+      
+      map.stopRoute()
+    }}
+  
+    showAlertBox('您已到达目的地', '是否结束本次导航', [cancel, confirm])
+  }
 })
 
 function checkExit() {
@@ -356,6 +417,17 @@ map.addEventListener(map.eventTypes.onRouterFinish, function() {
   }
 })
 
+function addCarMarker(pos) {
+  
+  var IDRCarMarker = indoorun.idrMapMarker.IDRCarMarker
+  
+  var endMarker = new IDRCarMarker(pos, config.publicPath + '/static/markericon/car.png')
+  
+  map.addMarker(endMarker)
+  
+  return endMarker
+}
+
 function addEndMarker(pos) {
   
   var IDREndMarker = indoorun.idrMapMarker.IDREndMarker
@@ -399,8 +471,6 @@ map.addEventListener(map.eventTypes.onRouterSuccess, function(data) {
 
 map.addEventListener(map.eventTypes.onInitMapSuccess, function(regionEx) {
   
-  map.changeFloor(regionEx.floorList[0].id)
-  
   showFloorListView(true)
   
   showEmptySpaceView(true)
@@ -419,6 +489,8 @@ map.addEventListener(map.eventTypes.onInitMapSuccess, function(regionEx) {
   zoomView = new ZoomView(map)
   
   zoomView.show()
+  
+  map.changeFloor(regionEx.floorList[0].id)
 })
 
 var findcarview = null
@@ -480,11 +552,15 @@ function onMarkUnitInMap() {
   
   showBottomBar(true, '长按车位进行选择')
   
-  map.addEventListener('onMapLongPress', function(pos) {
+  map.addEventListener(map.eventTypes.onMapLongPress, function(pos) {
+    
+    var unit = map.getNearUnit(pos)
+    
+    indoorun.idrNetworkInstance.saveMarkedUnit(unit, map.getRegionId(), null, null)
   
     map.doRoute(map.getUserPos(), pos)
   
-    map.removeEventListener('onMapLongPress')
+    map.removeEventListener(map.eventTypes.onMapLongPress)
   
     showBottomBar(false, '')
   })
@@ -492,12 +568,12 @@ function onMarkUnitInMap() {
 
 function onFindCar() {
   
-  // if (map.getUserPos() == null) {
-  //
-  //   errortipview.show('定位失败，无法找车')
-  //
-  //   return
-  // }
+  if (map.getUserPos() == null) {
+
+    errortipview.show('定位失败，无法找车')
+
+    return
+  }
 
   if (endMarker) {
   
@@ -578,6 +654,13 @@ function markWithBluetooth() {
 
   var pos = map.getUserPos()
   
+  if (endMarker) {
+    
+    map.centerPos(endMarker.position)
+    
+    return
+  }
+  
   if (!pos) {
   
     errortipview.show('定位失败，无法标记')
@@ -647,6 +730,8 @@ function deleteMarker() {
   map.removeMarker(endMarker)
   
   endMarker = null
+  
+  indoorun.idrNetworkInstance.removeMarkedUnit(null, null)
 }
 
 function sharePosition() {
@@ -654,7 +739,7 @@ function sharePosition() {
   var ua = navigator.userAgent;
   
   if(ua.match(/iPhone|iPod/i) != null){
-    
+  
     setTimeout("javascript:location.href='http://a.app.qq.com/o/simple.jsp?pkgname=com.yellfun.yellfunchene'", 0);
     
   } else if (ua.match(/Android/i) != null){
