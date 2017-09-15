@@ -276,6 +276,8 @@ map.addEventListener(map.eventTypes.onInitMapSuccess, function(regionEx) {
   
   showFindCarBtn()
   
+  showSearchUnitView()
+  
   document.title = regionEx.name
   
   zoomView = new ZoomView(map)
@@ -664,6 +666,120 @@ function showFindCarBtn() {
       onFindCar:function() {
         
         onFindCar()
+      }
+    }
+  })
+}
+
+function getFacilitys() {
+  
+  var temps = map.findUnitsWithType([1, 2, 3, 4, 5, 7, 8, 9, 10, 11])
+  
+  var icons = []
+  
+  for (var key in temps) {
+  
+    icons.push(getIcons(key))
+  }
+  
+  return icons
+}
+
+var futi = {
+  type:1,
+  title:'扶梯',
+  icon:'./static/扶梯.png'
+}
+
+var dianti = {
+  
+  type:2,
+  title:'电梯',
+  icon:'./static/电梯.png'
+}
+
+var xishoujian = {
+  type:3,
+  title:'洗手间',
+  icon:'./static/洗手间.png'
+}
+
+var atm = {
+  type:4,
+  title:'ATM',
+  icon:'./static/ATM.png'
+}
+
+var chukou = {
+  type:5,
+  title:'出口',
+  icon:'./static/chukou.png'
+}
+
+var rukou = {
+  type:7,
+  title:'入口',
+  icon:'./static/rukou.png'
+}
+
+var anquanchukou = {
+  type:8,
+  title:'安全出口',
+  icon:'./static/people.png'
+}
+
+var louti = {
+  type:9,
+  title:'楼梯',
+  icon:'./static/楼梯.png'
+}
+
+var xiche = {
+  type:10,
+  title:'洗车',
+  icon:'./static/xiche.png'
+}
+
+var shoufeichu = {
+  type:11,
+  title:'收费处',
+  icon:'./static/shoufeichu.png'
+}
+
+function getIcons(type) {
+  
+  if (type == 1) return futi
+  
+  if (type == 2) return dianti
+  
+  if (type == 3) return xishoujian
+  
+  if (type == 4) return atm
+  
+  if (type == 5) return chukou
+  
+  if (type == 7) return rukou
+  
+  if (type == 8) return anquanchukou
+  
+  if (type == 9) return louti
+  
+  if (type == 10) return xiche
+  
+  if (type == 11) return shoufeichu
+}
+
+import searchunit from './components/searchunit.vue'
+let _searchunit = null
+function showSearchUnitView() {
+  
+  _searchunit = new Vue({
+    el:'#searchunit',
+    components: { searchunit },
+    data: ()=> {
+      return {
+        allunits:map.regionEx.getAllUnits(),
+        allfacilitys:getFacilitys()
       }
     }
   })

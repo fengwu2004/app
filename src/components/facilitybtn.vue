@@ -1,18 +1,24 @@
 <template>
   <div v-on:click="onclick">
-    <img :src="item.icon"/>
-    <p> {{ item.title }} </p>
+    <img :src="getIcon"/>
   </div>
 </template>
 
 <script>
+
   export default {
     name : 'facilitybtn',
-    props:['item'],
+    props:['facility'],
+    computed:{
+      getIcon:function() {
+
+        return this.facility.icon
+      }
+    },
     methods: {
       onclick:function() {
-        this.$emit('onclickunitwith', this.item.type)
-        console.log(this.item.title)
+        this.$emit('onclickunitwith', this.facility.type)
+        console.log(this.facility.title)
       }
     }
   }
@@ -21,25 +27,16 @@
 <style scoped>
 
   div {
-    flex:1;
-    -webkit-flex: 1;
-    min-width: 33%;
-    max-width: 33%;
+    float: left;
+    width: 20%;
+    text-align: center;
+    padding: ;
   }
 
   img {
-    width: 50%;
-    left: 0;
-    right: 0;
     max-width: 50px;
-  }
-
-  p {
-    line-height: 14px;
-    font-size: 0.6rem;
-    text-align: center;
-    padding: 5px 0;
-    margin: 0;
+    width: 90%;
+    height: 90%;
   }
 
 </style>

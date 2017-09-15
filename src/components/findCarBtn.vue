@@ -62,6 +62,7 @@
     padding: 3px 3px;
     margin: 3px 3px;
     background-color: #0b79f2;
+    color: #FFFFFF;
   }
 
   .container {
