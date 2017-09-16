@@ -66,6 +66,12 @@
     <div id="searchunit">
       <searchunit v-on:navigatetounit="onNavigateToUnit" v-on:navigatetofacility="onNavigateToFacility" v-bind:allunits="allunits" v-bind:facilitys="allfacilitys"></searchunit>
     </div>
+    <div id="unitdetail">
+      <unitdetail v-bind:unit="unit" v-if="show" v-on:setend="onSetEnd" v-on:setstart="onSetStart"></unitdetail>
+    </div>
+    <div id="navigatestop">
+      <navigatestop v-if="show" v-on:click="click"></navigatestop>
+    </div>
     <label id="debug">这是调试信息</label>
   </body>
 </html>

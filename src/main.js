@@ -4,7 +4,6 @@ import Vue from 'vue'
 import indoorun from '../../indoorunMap/map.js'
 import FLoorListView from './floorlistview'
 import LocateStatusView from './locatestatusview'
-import FindFacilityBtnView from './findfacilityview'
 import FindFacilityView from './findfacility'
 import NavigateBottomBar from './navigateBottomBar'
 import AlertBox from './AlertBox'
@@ -13,6 +12,8 @@ import ErrorTipView from './errortipview'
 import ZoomView from './zoomview'
 import findwithnum from './components/findWithNum.vue'
 import findwithunit from './components/findWithUnit.vue'
+import unitdetail from './components/unitdetail.vue'
+import navigatestop from './components/navigatestop.vue'
 
 var config = require('../config')
 
@@ -32,14 +33,14 @@ var locateStatusView = null
 
 var findFacilityBtnView = null
 
-var navigateBottomBar = null
-
 var errortipview = new ErrorTipView()
 
 var alertboxview = null
 
 var zoomView = null
 
+var _carMarker = null
+var _carPos = null
 var _startPos = null
 var _endMarker = null
 var _endPos = null
@@ -69,26 +70,6 @@ function onSavePackingUnit(unit) {
     
     console.log('保存失败')
   })
-}
-
-function showNavigateBottombar(bshow, path, cb) {
-  
-  if (!navigateBottomBar && bshow) {
-    
-    navigateBottomBar = new NavigateBottomBar(map)
-  }
-  
-  navigateBottomBar && navigateBottomBar.show(bshow, path, cb)
-}
-
-function showFindFacilityBtnView(bshow, cb) {
-  
-  if (!findFacilityBtnView && bshow) {
-    
-    findFacilityBtnView = new FindFacilityBtnView(cb)
-  }
-  
-  findFacilityBtnView && findFacilityBtnView.show(bshow)
 }
 
 function showLocateStatusView(bshow) {
@@ -127,9 +108,9 @@ map.addEventListener(map.eventTypes.onFloorChangeSuccess, function(data) {
       
       if (res.code === 'success') {
         
-        _endPos = {x:res.data.svgX, y:res.data.svgY, floorId:res.data.floorId}
+        _carPos = {x:res.data.svgX, y:res.data.svgY, floorId:res.data.floorId}
         
-        _endMarker = addCarMarker(_endPos)
+        _carMarker = addCarMarker(_carPos)
       }
     }, null)
     
@@ -204,8 +185,6 @@ function checkExit() {
 
 map.addEventListener(map.eventTypes.onRouterFinish, function() {
   
-  showNavigateBottombar(false, null, null)
-  
   showSomeUIInNavi(true)
   
   map.removeMarker(_endMarker)
@@ -219,34 +198,16 @@ map.addEventListener(map.eventTypes.onRouterFinish, function() {
 
 function addCarMarker(pos) {
   
-  var IDRCarMarker = indoorun.idrMapMarker.IDRCarMarker
+  var marker = new indoorun.idrMapMarker.IDRCarMarker(pos, config.publicPath + '/static/markericon/车位标记点.png')
   
-  var endMarker = new IDRCarMarker(pos, config.publicPath + '/static/markericon/car.png')
+  map.addMarker(marker)
   
-  map.addMarker(endMarker)
-  
-  return endMarker
-}
-
-function addEndMarker(pos) {
-  
-  var IDREndMarker = indoorun.idrMapMarker.IDREndMarker
-  
-  var endMarker = new IDREndMarker(pos, config.publicPath + '/static/markericon/end.png')
-  
-  map.addMarker(endMarker)
-  
-  return endMarker
+  return marker
 }
 
 function showSomeUIInNavi(bshow) {
   
   showFloorListView(bshow)
-  
-  showFindFacilityBtnView(bshow, function() {
-    
-    showFindFacilityView()
-  })
 }
 
 map.addEventListener(map.eventTypes.onRouterSuccess, function(data) {
@@ -260,8 +221,6 @@ map.addEventListener(map.eventTypes.onRouterSuccess, function(data) {
   
   showBottomBar(false)
   
-  showNavigateBottombar(true, data.path, checkExit)
-  
   map.birdLook()
 })
 
@@ -270,11 +229,6 @@ map.addEventListener(map.eventTypes.onInitMapSuccess, function(regionEx) {
   showFloorListView(true)
   
   showLocateStatusView(true)
-  
-  showFindFacilityBtnView(true, function() {
-    
-    showFindFacilityView()
-  })
   
   showFindCarBtn()
   
@@ -285,6 +239,13 @@ map.addEventListener(map.eventTypes.onInitMapSuccess, function(regionEx) {
   zoomView.show()
   
   map.changeFloor(regionEx.floorList[0].id)
+})
+
+map.addEventListener(map.eventTypes.onUnitClick, (unit)=>{
+
+  console.log(unit)
+  
+  selectUnit(unit)
 })
 
 var tempMarkers = []
@@ -333,8 +294,6 @@ function onFindTargetUnits(units) {
 }
 
 function onMarkUnitInMap(resolve) {
-  
-  showFindFacilityBtnView(false)
   
   showBottomBar(true, '长按车位进行选择')
   
@@ -793,10 +752,216 @@ function showSearchUnitView() {
       onNavigateToFacility:(facility)=>{
        
         console.log(facility)
+        
+        selectFacility(facility.type.toString())
       },
       onNavigateToUnit: (unit)=>{
       
+        console.log(unit)
+        
+        selectUnit(unit)
       }
     }
   })
+}
+
+function addTempMarker(pos) {
+  
+  var marker = new indoorun.idrMapMarker.IDRTempMarker(pos, config.publicPath + '/static/markericon/temppoint.png')
+  
+  map.addMarker(marker)
+  
+  return marker
+}
+
+var _unitdetailview = null
+
+function show(unit, cb) {
+  
+  if (_unitdetailview) {
+  
+    _unitdetailview.show = true
+  
+    _unitdetailview.unit = unit
+  
+    _unitdetailview.cb = cb
+    
+    return
+  }
+  
+  _unitdetailview = new Vue({
+    el:'#unitdetail',
+    components:{ unitdetail },
+    data:()=>{
+      return {
+        unit:unit,
+        show:true,
+        cb:cb
+      }
+    },
+    methods:{
+      onSetStart:function() {
+      
+        this.show = false
+  
+        this.cb && this.cb(0)
+      },
+      onSetEnd:function() {
+  
+        this.show = false
+  
+        this.cb && this.cb(1)
+      }
+    }
+  })
+}
+
+function addEndMarker(pos) {
+  
+  var endMarker = new indoorun.idrMapMarker.IDREndMarker(pos, config.publicPath + '/static/markericon/终点.png')
+  
+  map.addMarker(endMarker)
+  
+  return endMarker
+}
+
+function addStartMaker(pos) {
+  
+  var marker = new indoorun.idrMapMarker.IDRStartMarker(pos, config.publicPath + '/static/markericon/起点.png')
+  
+  map.addMarker(marker)
+  
+  return marker
+}
+
+function selectUnit(unit) {
+  
+  Promise.resolve()
+    .then(()=>{
+    
+      var marker = addTempMarker(unit.getPos())
+      
+      map.centerPos(unit.getPos(), true)
+      
+      return Promise.resolve(marker)
+    })
+    .then((marker)=>{
+    
+      return new Promise((resolve)=>{
+        
+        show(unit, (res)=>{
+          
+          if (res == 0) {
+            
+            resolve({action:'start', marker:marker})
+          }
+          else {
+  
+            resolve({action:'end', marker:marker})
+          }
+        })
+      })
+    })
+    .then((res)=>{
+    
+      if (res.action === 'start') {
+        
+        map.removeMarker(res.marker)
+  
+        map.removeMarker(_startMarker)
+  
+        _startMarker = addStartMaker(unit.getPos())
+  
+        _startPos = unit.getPos()
+      }
+      
+      if (res.action === 'end') {
+  
+        map.removeMarker(res.marker)
+  
+        map.removeMarker(_endMarker)
+  
+        _endMarker = addEndMarker(unit.getPos())
+  
+        _endPos = unit.getPos()
+      }
+      
+      return promiseOfRoute(_startPos, _endPos)
+    })
+    .then((routersuccess)=>{
+      
+      if (routersuccess) {
+        
+        showStopNavigate()
+      }
+    })
+}
+
+function promiseOfRoute(start, end) {
+
+  if (start && end) {
+    
+    map.doRoute(start, end)
+    
+    return Promise.resolve(true)
+  }
+  
+  return Promise.resolve(false)
+}
+
+function selectFacility(type) {
+  
+  var types = []
+  
+  types.push(type)
+  
+  var temps = map.findUnitsWithType(types)
+  
+  if (type in temps && temps[type].length > 0) {
+  
+    selectUnit(temps[type][0])
+  }
+}
+
+var _navigateStopView = null
+
+function showStopNavigate() {
+  
+  if (_navigateStopView) {
+  
+    _navigateStopView.show = true
+    
+    return
+  }
+  
+  _navigateStopView = new Vue({
+    el:'#navigatestop',
+    components:{ navigatestop },
+    data:()=>{
+      return {
+        show:true
+      }
+    },
+    methods:{
+      click:function() {
+        
+        this.show = false
+        
+        map.stopRoute()
+        
+        resetStartEndPos()
+      }
+    }
+  })
+}
+
+function resetStartEndPos() {
+  
+  _startPos = null
+  
+  _endPos = null
+  
+  map.removeMarker(_startMarker)
+  
+  map.removeMarker(_endMarker)
 }
