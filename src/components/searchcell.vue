@@ -1,7 +1,7 @@
 <template>
   <div class="cell">
     <label>{{ value }}</label>
-    <div class="arrow"></div>
+    <div class="arrow" v-on:click="onClick"></div>
     <div class="line"></div>
   </div>
 </template>
@@ -11,6 +11,12 @@
   export default {
     name: 'searchcell',
     props:['value'],
+    methods:{
+      onClick:function() {
+        console.log('点击点击')
+        this.$emit('clickcell', this.value)
+      }
+    }
   }
 
 </script>

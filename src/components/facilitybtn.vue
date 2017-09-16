@@ -1,6 +1,8 @@
 <template>
-  <div v-on:click="onclick">
-    <img :src="getIcon"/>
+  <div class="main" v-on:click="onclick">
+    <div class="center">
+      <img :src="getIcon"/>
+    </div>
   </div>
 </template>
 
@@ -17,8 +19,8 @@
     },
     methods: {
       onclick:function() {
-        this.$emit('onclickunitwith', this.facility.type)
-        console.log(this.facility.title)
+
+        this.$emit('click', this.facility)
       }
     }
   }
@@ -26,17 +28,23 @@
 
 <style scoped>
 
-  div {
-    float: left;
-    width: 20%;
-    text-align: center;
-    padding: ;
+  .main {
+
+    width: 53px;
+    height: 53px;
+    margin: 5px;
+  }
+
+  .center {
+
+    width: 95%;
+    height: 95%;
+    margin: 2.5%;
   }
 
   img {
-    max-width: 50px;
-    width: 90%;
-    height: 90%;
+    width: 100%;
+    height: 100%;
   }
 
 </style>

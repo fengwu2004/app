@@ -2,26 +2,28 @@
   <div>
     <div class="inputComponent">
       <div class="search"/>
-      <input v-model="value" type="search" class="searhinput" placeholder="输入商铺名车、车位号、服务设施">
+      <input v-model="value" v-on:focus="onFocus" type="search" class="searhinput" placeholder="输入商铺名车、车位号、服务设施">
       <div v-if="start" class="cancel" type="submit"/>
       <div v-if="!start" class="submit" type="submit">搜索</div>
     </div>
-    <div class="container">
-      <table v-if="start">
-        <tr v-for="unit in validunits">
-          <td>
-            <searchcell v-bind:key="unit.id" v-bind:value="unit.name"></searchcell>
-          </td>
-        </tr>
-      </table>
-      <div v-if="start && results.length == 0 ">
-        <div class="noresultimg">
-          <img src="../assets/搜索无结果-icon.png"/>
+    <div class="bg" v-if="beginInput" v-on:click="onClickBg">
+      <div class="container">
+        <table v-if="start">
+          <tr v-for="unit in validunits" v-on:click="onClick(unit)">
+            <td>
+              <searchcell v-bind:key="unit.id" v-bind:value="unit.name"></searchcell>
+            </td>
+          </tr>
+        </table>
+        <div v-if="start && validunits.length == 0 ">
+          <div class="noresultimg">
+            <img src="../assets/搜索无结果-icon.png"/>
+          </div>
+          <div class="noresulttext">搜索暂无结果，请重试</div>
         </div>
-        <div class="noresulttext">搜索暂无结果，请重试</div>
-      </div>
-      <div v-if="!start" class="facilitys">
-        <facilitybtn v-for="facility in facilitys" v-bind:facility="facility" v-bind:key="facility.type"></facilitybtn>
+        <div v-if="!start" class="facilitys">
+          <facilitybtn class="facility" v-for="facility in facilitys" v-bind:facility="facility" v-bind:key="facility.type" v-on:click="onClickFacility(facility)"></facilitybtn>
+        </div>
       </div>
     </div>
   </div>
@@ -32,6 +34,26 @@
   import searchcell from './searchcell.vue'
   import facilitybtn from './facilitybtn.vue'
 
+  function findSearchResult(name, units, count) {
+
+    let temps = []
+
+    for (let i = 0; i < units.length; ++i) {
+
+      if (units[i].name.indexOf(name) >= 0) {
+
+        temps.push(units[i])
+      }
+    }
+
+    if (temps.length > count) {
+
+      return temps.slice(0, 15)
+    }
+
+    return temps
+  }
+
   export default {
     name: 'searchunit',
     components: { searchcell, facilitybtn },
@@ -41,8 +63,39 @@
         msgs: [],
         start:false,
         value:'',
-        results:[],
+        beginInput:false,
         validunits:[]
+      }
+    },
+    methods: {
+
+      endInput:function() {
+
+        this.beginInput = false
+
+        this.value = ''
+      },
+      onFocus:function() {
+
+        this.beginInput = true
+      },
+      onClick:function(unit) {
+
+        this.endInput()
+
+        console.log(JSON.stringify(unit))
+
+        this.$emit('navigatetounit', unit)
+      },
+      onClickBg:function() {
+
+        this.endInput()
+      },
+      onClickFacility:function(facility) {
+
+        this.endInput()
+
+        this.$emit('navigatetofacility', facility)
       }
     },
     watch: {
@@ -50,13 +103,34 @@
 
         this.start = val.length > 0
 
-        console.log(val)
+        this.validunits = findSearchResult(this.value, this.allunits, 15)
+      },
+      beginInput:function(val) {
+
+        if (val == false) {
+
+
+        }
       }
     }
   }
 </script>
 
 <style scoped>
+
+  .main {
+    position: relative;
+  }
+
+  .bg {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: 0;
+    /*z-index: 1001;*/
+    background-color: #eeeef2; }
 
   .inputComponent {
 
@@ -67,6 +141,7 @@
     height: 60px;
     width: 90%;
     margin: auto;
+    z-index: 100;
   }
 
   .search {
@@ -135,7 +210,7 @@
 
   .container {
 
-    margin-top: 20px;
+    margin-top: 100px;
     height: 50%;
     width: 100%;
     border: 0px;
@@ -182,7 +257,9 @@
 
   .facilitys {
 
-    /*display: flex;*/
+    display: flex;
+    display: -webkit-flex;
+    width: 100%;
   }
 
 </style>

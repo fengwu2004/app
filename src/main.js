@@ -45,7 +45,7 @@ var _endMarker = null
 var _endPos = null
 var _startMarker = null
 
-indoorun.idrDebug.showDebugInfo(true)
+// indoorun.idrDebug.showDebugInfo(true)
 
 function onSavePackingUnit(unit) {
   
@@ -136,7 +136,9 @@ map.addEventListener(map.eventTypes.onFloorChangeSuccess, function(data) {
     getSaveUnit = true
   }
   
-  indoorun.idrDebug.showDebugInfo(true)
+  // indoorun.idrDebug.showDebugInfo(true)
+  
+  showSearchUnitView()
   
   indoorun.idrDebug.debugInfo('加载时间:' + (new Date().getTime() - gmtime).toString())
   
@@ -275,8 +277,6 @@ map.addEventListener(map.eventTypes.onInitMapSuccess, function(regionEx) {
   })
   
   showFindCarBtn()
-  
-  showSearchUnitView()
   
   document.title = regionEx.name
   
@@ -773,13 +773,29 @@ import searchunit from './components/searchunit.vue'
 let _searchunit = null
 function showSearchUnitView() {
   
+  if (_searchunit) {
+  
+    _searchunit.allunits = map.regionEx.getAllUnits(map.getFloorId())
+    
+    return
+  }
+  
   _searchunit = new Vue({
     el:'#searchunit',
     components: { searchunit },
     data: ()=> {
       return {
-        allunits:map.regionEx.getAllUnits(),
+        allunits:map.regionEx.getAllUnits(map.getFloorId()),
         allfacilitys:getFacilitys()
+      }
+    },
+    methods:{
+      onNavigateToFacility:(facility)=>{
+       
+        console.log(facility)
+      },
+      onNavigateToUnit: (unit)=>{
+      
       }
     }
   })

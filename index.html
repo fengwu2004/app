@@ -64,7 +64,7 @@
       <zoom v-bind:map="map"></zoom>
     </div>
     <div id="searchunit">
-      <searchunit v-bind:allunits="allunits" v-bind:facilitys="allfacilitys"></searchunit>
+      <searchunit v-on:navigatetounit="onNavigateToUnit" v-on:navigatetofacility="onNavigateToFacility" v-bind:allunits="allunits" v-bind:facilitys="allfacilitys"></searchunit>
     </div>
     <label id="debug">这是调试信息</label>
   </body>
