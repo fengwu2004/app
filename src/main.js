@@ -14,6 +14,7 @@ import findwithnum from './components/findWithNum.vue'
 import findwithunit from './components/findWithUnit.vue'
 import unitdetail from './components/unitdetail.vue'
 import navigatestop from './components/navigatestop.vue'
+import cancelmark from './components/cancelmark.vue'
 
 var config = require('../config')
 
@@ -96,7 +97,7 @@ var gmtime = new Date().getTime()
 
 map.initMap('2b497ada3b2711e4b60500163e0e2e6b', 'map', regionId)
 
-var getSaveUnit = false
+var getSaveUnit = true
 
 map.addEventListener(map.eventTypes.onFloorChangeSuccess, function(data) {
   
@@ -243,7 +244,7 @@ map.addEventListener(map.eventTypes.onInitMapSuccess, function(regionEx) {
 
 map.addEventListener(map.eventTypes.onUnitClick, (unit)=>{
 
-  console.log(unit)
+  console.log(JSON.stringify(unit))
   
   selectUnit(unit)
 })
@@ -293,9 +294,11 @@ function onFindTargetUnits(units) {
   })
 }
 
-function onMarkUnitInMap(resolve) {
+function onMarkUnitInMap(cb) {
   
   showBottomBar(true, '长按车位进行选择')
+  
+  map.removeEventListener(map.eventTypes.onUnitClick)
   
   map.addEventListener(map.eventTypes.onMapLongPress, function(pos) {
     
@@ -304,23 +307,30 @@ function onMarkUnitInMap(resolve) {
     indoorun.idrNetworkInstance.saveMarkedUnit(unit, map.getRegionId(), null, null)
     
     map.removeEventListener(map.eventTypes.onMapLongPress)
+  
+    map.addEventListener(map.eventTypes.onUnitClick, (unit)=>{
+    
+      console.log(JSON.stringify(unit))
+    
+      selectUnit(unit)
+    })
     
     showBottomBar(false, '')
-    
-    resolve(unit)
+  
+    cb && cb(unit.getPos())
   })
 }
 
-function promiseOfFindEndPos() {
+function promiseOfFindCarPos() {
   
-  if (_endPos) {
+  if (_carPos) {
     
-    return Promise.resolve(_endPos)
+    return Promise.resolve(_carPos)
   }
   
   return new Promise((resolve) => {
     
-    showFindCarView(resolve)
+    showMarkCarView(resolve)
   })
 }
 
@@ -335,7 +345,7 @@ function promiseOfFindStartPos() {
     
     new Promise((resolve)=>{
   
-      showFindCarWithUnit(map.getFloorId(), resolve)
+      showFindCarWithUnit('当前所在位置', map.getFloorId(), resolve)
     })
       .then((res)=>{
         
@@ -349,12 +359,8 @@ function promiseOfFindStartPos() {
           onMarkUnitInMap(resolve)
         })
       })
-      .then((unit)=>{
-      
-        let pos = unit.getPos()
-  
-        addCarMarker(pos)
-  
+      .then((pos)=>{
+        
         presolve && presolve(pos)
       })
   })
@@ -362,13 +368,13 @@ function promiseOfFindStartPos() {
 
 function onFindCar() {
   
-  promiseOfFindEndPos()
+  promiseOfFindCarPos()
     
     .then((pos)=>{
       
-      _endPos = pos
+      _carPos = pos
       
-      addCarMarker(_endPos)
+      _carMarker = addCarMarker(_carPos)
       
       return promiseOfFindStartPos()
       
@@ -376,10 +382,29 @@ function onFindCar() {
     
     _startPos = pos
   
-    addCarMarker(_startPos)
+    _startMarker = addStartMaker(_startPos)
     
-    map.doRoute(_startPos, _endPos)
+    return promiseOfRoute(_startPos, _carPos)
   })
+    .then((routersuccess)=>{
+    
+      if (routersuccess) {
+      
+        return new Promise((resolve)=>{
+          
+          showStopNavigate(resolve)
+        })
+      }
+      
+      return Promise.reject()
+    })
+    .then(()=>{
+    
+      resetStartEndPos()
+    })
+    .catch(()=>{
+    
+    })
 }
 
 function promiseOfFindCarByUnit(floorId, unitName) {
@@ -428,7 +453,7 @@ function showFindCarWithNum(resolve) {
   
   if (_findcarwithnum) {
     
-    _findcarwithnum.$el.style.visibility = 'visible'
+    _findcarwithnum.show = true
     
     _findcarwithnum.resolve = resolve
     
@@ -442,6 +467,7 @@ function showFindCarWithNum(resolve) {
       return {
         errorshow:'hidden',
         resolve:resolve,
+        show:true
       }
     },
     methods:{
@@ -468,17 +494,17 @@ function showFindCarWithNum(resolve) {
       },
       onClose: function() {
         
-        this.$el.style.visibility = 'hidden'
+        this.show = false
       }
     }
   })
 }
 
-function showFindCarWithUnit(currentFloorId, resolve) {
+function showFindCarWithUnit(title, currentFloorId, resolve) {
   
   if (_findcarwithunit) {
     
-    _findcarwithunit.$el.style.visibility = 'visible'
+    _findcarwithunit.show = true
     
     _findcarwithunit.resolve = resolve
     
@@ -492,7 +518,10 @@ function showFindCarWithUnit(currentFloorId, resolve) {
       return {
         errorshow:'hidden',
         currentFloorId:currentFloorId,
-        resolve:resolve
+        resolve:resolve,
+        floorlist:map.regionEx.floorList,
+        show:true,
+        title:title
       }
     },
     methods:{
@@ -513,7 +542,7 @@ function showFindCarWithUnit(currentFloorId, resolve) {
             
             this.onClose()
             
-            this.resolve(units[0])
+            this.resolve(units[0].getPos())
           })
       },
       onCancel:function() {
@@ -524,13 +553,13 @@ function showFindCarWithUnit(currentFloorId, resolve) {
       },
       onClose: function() {
         
-        this.$el.style.visibility = 'hidden'
+        this.show = false
       },
     }
   })
 }
 
-function showFindCarView(cb) {
+function showMarkCarView(cb) {
   
   new Promise((resolve, reject)=>{
     
@@ -540,19 +569,19 @@ function showFindCarView(cb) {
       
       if (res !== false) {
         
-        return res
+        return Promise.resolve(res)
       }
       
       return new Promise((resolve)=>{
         
-        showFindCarWithUnit(map.getFloorId(), resolve)
+        showFindCarWithUnit('车位标记', map.getFloorId(), resolve)
       })
     })
     .then((res)=>{
       
       if (res !== false) {
-        
-        return res
+  
+        return Promise.resolve(res)
       }
       
       return new Promise((resolve)=>{
@@ -560,10 +589,10 @@ function showFindCarView(cb) {
         onMarkUnitInMap(resolve)
       })
     })
-    .then((unit)=>{
-      
-      let pos = unit.getPos()
-      
+    .then((pos)=>{
+    
+      map.centerPos(pos, true)
+    
       cb && cb(pos)
     })
     .catch(() => {
@@ -613,13 +642,15 @@ function showFindCarBtn() {
     el: "#findcarbtn",
     components: { findcarbtn },
     methods:{
-      onFindUnit:function() {
-        
-        showFindCarView(function(pos) {
+      onMarkUnit:function() {
+  
+        showMarkCarView(function(pos) {
           
-          _startPos = pos
+          _carPos = pos
           
-          _startMarker = addCarMarker(pos)
+          _carMarker = addCarMarker(pos)
+          
+          showCancelMark()
         })
       },
       onFindCar:function() {
@@ -892,8 +923,20 @@ function selectUnit(unit) {
       
       if (routersuccess) {
         
-        showStopNavigate()
+        return new Promise((resovle)=>{
+          
+          showStopNavigate(resovle)
+        })
       }
+      
+      return Promise.reject()
+    })
+    .then(()=>{
+    
+      resetStartEndPos()
+    })
+    .catch(()=>{
+    
     })
 }
 
@@ -925,11 +968,13 @@ function selectFacility(type) {
 
 var _navigateStopView = null
 
-function showStopNavigate() {
+function showStopNavigate(cb) {
   
   if (_navigateStopView) {
   
     _navigateStopView.show = true
+  
+    _navigateStopView.cb = cb
     
     return
   }
@@ -939,7 +984,8 @@ function showStopNavigate() {
     components:{ navigatestop },
     data:()=>{
       return {
-        show:true
+        show:true,
+        cb:cb
       }
     },
     methods:{
@@ -949,7 +995,7 @@ function showStopNavigate() {
         
         map.stopRoute()
         
-        resetStartEndPos()
+        this.cb && this.cb()
       }
     }
   })
@@ -963,5 +1009,46 @@ function resetStartEndPos() {
   
   map.removeMarker(_startMarker)
   
+  _startMarker = null
+  
   map.removeMarker(_endMarker)
+  
+  _endMarker = null
+}
+
+var _cancelMarkView = null
+function showCancelMark() {
+  
+  if (_cancelMarkView) {
+  
+    _cancelMarkView.show = true
+    
+    return
+  }
+  
+  _cancelMarkView = new Vue({
+    el:'#cancelmark',
+    components:{ cancelmark },
+    data:()=>{
+      return {
+        show:true
+      }
+    },
+    methods:{
+      clickbg:function() {
+        
+        this.show = false
+      },
+      click:function() {
+        
+        this.show = false
+        
+        _carPos = null
+        
+        map.removeMarker(_carMarker)
+  
+        _carMarker = null
+      }
+    }
+  })
 }

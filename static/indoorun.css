@@ -60,7 +60,7 @@
 .lc_div{
   position: absolute;
   right:1.1rem;
-  top:15%;
+  top:120px;
   border-radius: 5px;
   width: 2.2rem;
   height: 2.3rem;
@@ -76,11 +76,11 @@
 
 #composs {
   position: absolute;
-  left: 1rem;
-  top: 10%;
+  left: 1.5rem;
+  top: 120px;
   width: 2.5rem;
   height: 2.5rem;
   transform: rotate(0deg);
-  background: url("./resetMap.png") transparent no-repeat;
+  background: url("./指北针.png") transparent no-repeat;
   background-size: contain;
 }

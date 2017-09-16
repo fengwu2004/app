@@ -34,7 +34,7 @@ body, html {
 #floorList {
   position: absolute;
   right: 1.1rem;
-  top: 15%; }
+  top: 120px; }
 
 #emptyspace {
   top: 5%;
@@ -74,14 +74,14 @@ body, html {
   font-size: 0.5rem;
   visibility: hidden; }
 
-/*#searchunit {*/
-  /*position: absolute;*/
-  /*left: 0;*/
-  /*right: 0;*/
-  /*top: 0;*/
-  /*bottom: 0;*/
-  /*margin: 0;*/
-  /*z-index: 1001;*/
-  /*background-color: #eeeef2; }*/
+#searchunit {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: 0;
+  z-index: 1001;
+  background-color: #eeeef2; }
 
 /*# sourceMappingURL=app.css.map */

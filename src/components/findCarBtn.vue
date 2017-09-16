@@ -25,7 +25,7 @@
       },
       findUnit:function() {
 
-        this.$emit('onfindunit')
+        this.$emit('onmarkunit')
 
         this.show = false
       },
@@ -44,7 +44,7 @@
 
   .bigbtn {
 
-    background: url("../assets/tmp1.png") no-repeat;
+    background: url("../assets/停车找车.png") no-repeat;
     background-size: 5rem;
     display: inline-block;
     height: 5rem;
@@ -57,19 +57,19 @@
   .btn {
 
     display: inline-block;
-    font-size: 0.8rem;
+    font-size: 1rem;
     font-weight: bold;
     padding: 3px 3px;
     margin: 3px 3px;
-    background-color: #0b79f2;
+    background-color: #FF4343;
     color: #FFFFFF;
   }
 
   .container {
 
     vertical-align: middle;
-    border: 3px #0b79f2 solid;
-    border-radius: 3px;
+    border: 3px #b30f0f solid;
+    border-radius: 4px;
     padding-left: 30px;
     display: inline-block;
     position: relative;

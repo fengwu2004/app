@@ -25,10 +25,10 @@
       <floorlistdiv v-bind:floorlist="floorList" v-bind:selectfloorid="currentFloorId" v-on:onselect="onSelect"></floorlistdiv>
     </div>
     <div id="findwithnum">
-      <findwithnum v-bind:errorshow="errorshow" v-on:close="onClose" v-on:confirm="onConfirm" v-on:cancel="onCancel"></findwithnum>
+      <findwithnum v-if="show" v-bind:errorshow="errorshow" v-on:close="onClose" v-on:confirm="onConfirm" v-on:cancel="onCancel"></findwithnum>
     </div>
     <div id="findwithunit">
-      <findwithunit v-bind:errorshow="errorshow" v-on:selectfloor="onSelectFloor" v-on:confirm="onConfirm" v-bind:initfloorid="currentFloorId" v-on:close="onClose" v-on:cancel="onCancel"></findwithunit>
+      <findwithunit v-if="show" v-bind:title="title" v-bind:floorlist="floorlist" v-bind:errorshow="errorshow" v-on:selectfloor="onSelectFloor" v-on:confirm="onConfirm" v-bind:initfloorid="currentFloorId" v-on:close="onClose" v-on:cancel="onCancel"></findwithunit>
     </div>
     <div id="markwithble">
       <markwithble v-bind:name="name" v-on:confirm="onConfirm" v-on:close="onClose"></markwithble>
@@ -58,7 +58,7 @@
       <errortipview v-bind:message="message" v-bind:opacity="display"></errortipview>
     </div>
     <div id="findcarbtn">
-      <findcarbtn v-on:onfindunit="onFindUnit" v-on:onfindcar="onFindCar"></findcarbtn>
+      <findcarbtn v-on:onmarkunit="onMarkUnit" v-on:onfindcar="onFindCar"></findcarbtn>
     </div>
     <div id="zoom">
       <zoom v-bind:map="map"></zoom>
@@ -71,6 +71,9 @@
     </div>
     <div id="navigatestop">
       <navigatestop v-if="show" v-on:click="click"></navigatestop>
+    </div>
+    <div id="cancelmark">
+      <cancelmark v-if="show" v-on:clickbg="clickbg" v-on:click="click"></cancelmark>
     </div>
     <label id="debug">这是调试信息</label>
   </body>

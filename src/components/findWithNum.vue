@@ -3,7 +3,7 @@
     <div class="bg" v-on:click="onClose"></div>
     <div class="content">
       <div class="closeBtn" v-on:click="onClose()"></div>
-      <img class="tag" src="../assets/car.png">
+      <img class="tag" src="../assets/找车弹窗-icon.png">
       <p class="title">车牌找车</p>
       <p class="tip">请输入您的车牌号</p>
       <input placeholder="例：粤B NB001">
@@ -94,9 +94,9 @@
     display: block;
     left: 0;
     right: 0;
-    margin: -4.5rem auto;
-    width: 9rem;
-    height: 9rem;
+    margin: -2.5rem auto;
+    width: 5rem;
+    height: 5rem;
   }
 
   .title {
@@ -104,7 +104,7 @@
     font-size: 1.4rem;
     font-weight: 400;
     margin: 0;
-    padding: 5rem 0 10px 0;
+    padding: 3rem 0 10px 0;
   }
 
   .tip {
@@ -141,25 +141,25 @@
 
   .confirmBtn {
     width: 80%;
-    background-color: #0086ff;
+    background-color: #ff4343;
     color: white;
     text-align: center;
     margin: 10px auto;
-    line-height: 2rem;
-    border-radius: 3px;
-    border: 2px solid #0086ff;
+    line-height: 40px;
+    border-radius: 20px;
+    border: 2px solid #ff4343;
     padding: 0px 10px;
   }
 
   .cancelBtn {
     width: 80%;
     background-color: white;
-    color: #0086ff;
+    color: #202841;
     text-align: center;
     margin: 10px auto 10px;
-    line-height: 2rem;
-    border-radius: 3px;
-    border: 1px solid #0086ff;
+    line-height: 40px;
+    border-radius: 20px;
+    border: 1px solid #202831;
     padding: 1px 10px;
   }
 
