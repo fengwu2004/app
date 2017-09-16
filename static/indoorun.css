@@ -57,10 +57,10 @@
   height: 100%;
 }
 
-.lc_div{
+.lc_div {
   position: absolute;
   right:1.1rem;
-  top:120px;
+  top:2.3rem;
   border-radius: 5px;
   width: 2.2rem;
   height: 2.3rem;
@@ -81,6 +81,6 @@
   width: 2.5rem;
   height: 2.5rem;
   transform: rotate(0deg);
-  background: url("./指北针.png") transparent no-repeat;
+  background: url("./cop.png") transparent no-repeat;
   background-size: contain;
 }

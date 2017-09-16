@@ -1,21 +1,23 @@
 <template>
-  <div class="main">
-    <div class="unitname">
-      <label>{{ unit.name }}</label>
-    </div>
-    <div class="navigate" v-on:click="setStart">
-      <div class="left">
-        <img src="../assets/设为起点-icon.png" width="20px" height="20px">
-        <label>设为起点</label>
+  <div>
+    <div class="bg" v-on:click="clickbg"></div>
+    <div class="main">
+      <div class="unitname">
+        <label>{{ unit.name }}</label>
       </div>
-      <div class="right" v-on:click="setEnd">
-        <img src="../assets/设为终点-icon.png"  width="20px" height="20px">
-        <label>设为终点</label>
+      <div class="navigate" v-on:click="setStart">
+        <div class="left">
+          <img src="../assets/设为起点-icon.png" width="20px" height="20px">
+          <label>设为起点</label>
+        </div>
+        <div class="right" v-on:click="setEnd">
+          <img src="../assets/设为终点-icon.png"  width="20px" height="20px">
+          <label>设为终点</label>
+        </div>
       </div>
     </div>
   </div>
 </template>
-
 <script>
 export default {
   name: 'unitdetail',
@@ -26,12 +28,25 @@ export default {
     },
     setEnd:function() {
       this.$emit('setend')
+    },
+    clickbg:function() {
+      this.$emit('clickbg')
     }
   }
 }
 </script>
 
 <style scoped>
+
+  .bg {
+
+    position: fixed;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0;
+    right: 0;
+    opacity: 1;
+  }
 
   .main {
 

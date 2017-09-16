@@ -1,11 +1,5 @@
 <template>
   <div>
-    <div class="inputComponent">
-      <div class="search"/>
-      <input v-model="value" v-on:focus="onFocus" type="search" class="searhinput" placeholder="输入商铺名车、车位号、服务设施">
-      <div v-if="start" class="cancel" type="submit"/>
-      <div v-if="!start" class="submit" type="submit">搜索</div>
-    </div>
     <div class="bg" v-if="beginInput" v-on:click="onClickBg">
       <div class="container">
         <table v-if="start">
@@ -25,6 +19,12 @@
           <facilitybtn class="facility" v-for="facility in facilitys" v-bind:facility="facility" v-bind:key="facility.type" v-on:click="onClickFacility(facility)"></facilitybtn>
         </div>
       </div>
+    </div>
+    <div class="inputComponent">
+      <div class="search"/>
+      <input v-model="value" v-on:focus="onFocus" type="search" class="searhinput" placeholder="输入商铺名车、车位号、服务设施">
+      <div v-if="start" class="cancel" type="submit"/>
+      <div v-if="!start" class="submit" type="submit">搜索</div>
     </div>
   </div>
 </template>
@@ -129,7 +129,7 @@
     top: 0;
     bottom: 0;
     margin: 0;
-    /*z-index: 1001;*/
+    z-index: 1001;
     background-color: #eeeef2; }
 
   .inputComponent {
@@ -141,7 +141,7 @@
     height: 60px;
     width: 90%;
     margin: auto;
-    z-index: 100;
+    z-index: 1002;
   }
 
   .search {
@@ -173,6 +173,7 @@
     border: 0px solid white;
     vertical-align: middle;
     line-height: 40px;
+    outline:none;
   }
 
   .cancel {

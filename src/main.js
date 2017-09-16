@@ -75,6 +75,7 @@ function onSavePackingUnit(unit) {
 
 function showLocateStatusView(bshow) {
   
+  return
   if (!locateStatusView && bshow) {
     
     locateStatusView = new LocateStatusView(map)
@@ -209,6 +210,8 @@ function addCarMarker(pos) {
 function showSomeUIInNavi(bshow) {
   
   showFloorListView(bshow)
+  
+  _findCarBtnView.show = bshow
 }
 
 map.addEventListener(map.eventTypes.onRouterSuccess, function(data) {
@@ -636,11 +639,17 @@ function showBottomBar(bshow, message) {
 }
 
 import findcarbtn from './components/findCarBtn.vue'
+var _findCarBtnView = null
 function showFindCarBtn() {
   
-  new Vue({
+  _findCarBtnView = new Vue({
     el: "#findcarbtn",
     components: { findcarbtn },
+    data:()=>{
+      return {
+        show:true
+      }
+    },
     methods:{
       onMarkUnit:function() {
   
@@ -703,13 +712,13 @@ var atm = {
 var chukou = {
   type:5,
   title:'出口',
-  icon:'./static/chukou.png'
+  icon:'./static/出口.png'
 }
 
 var rukou = {
   type:7,
   title:'入口',
-  icon:'./static/rukou.png'
+  icon:'./static/入口.png'
 }
 
 var anquanchukou = {
@@ -733,7 +742,7 @@ var xiche = {
 var shoufeichu = {
   type:11,
   title:'收费处',
-  icon:'./static/shoufeichu.png'
+  icon:'./static/收费处.png'
 }
 
 function getIcons(type) {
@@ -809,6 +818,8 @@ var _unitdetailview = null
 
 function show(unit, cb) {
   
+  _findCarBtnView.show = false
+  
   if (_unitdetailview) {
   
     _unitdetailview.show = true
@@ -831,15 +842,25 @@ function show(unit, cb) {
       }
     },
     methods:{
+      clickbg:function() {
+        
+        this.show = false
+  
+        _findCarBtnView.show = true
+      },
       onSetStart:function() {
       
         this.show = false
+  
+        _findCarBtnView.show = true
   
         this.cb && this.cb(0)
       },
       onSetEnd:function() {
   
         this.show = false
+  
+        _findCarBtnView.show = true
   
         this.cb && this.cb(1)
       }

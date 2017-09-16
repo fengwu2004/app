@@ -58,7 +58,7 @@
       <errortipview v-bind:message="message" v-bind:opacity="display"></errortipview>
     </div>
     <div id="findcarbtn">
-      <findcarbtn v-on:onmarkunit="onMarkUnit" v-on:onfindcar="onFindCar"></findcarbtn>
+      <findcarbtn v-if="show" v-on:onmarkunit="onMarkUnit" v-on:onfindcar="onFindCar"></findcarbtn>
     </div>
     <div id="zoom">
       <zoom v-bind:map="map"></zoom>
@@ -66,14 +66,14 @@
     <div id="searchunit">
       <searchunit v-on:navigatetounit="onNavigateToUnit" v-on:navigatetofacility="onNavigateToFacility" v-bind:allunits="allunits" v-bind:facilitys="allfacilitys"></searchunit>
     </div>
-    <div id="unitdetail">
-      <unitdetail v-bind:unit="unit" v-if="show" v-on:setend="onSetEnd" v-on:setstart="onSetStart"></unitdetail>
-    </div>
     <div id="navigatestop">
       <navigatestop v-if="show" v-on:click="click"></navigatestop>
     </div>
     <div id="cancelmark">
       <cancelmark v-if="show" v-on:clickbg="clickbg" v-on:click="click"></cancelmark>
+    </div>
+    <div id="unitdetail">
+      <unitdetail v-bind:unit="unit" v-if="show" v-on:clickbg="clickbg" v-on:setend="onSetEnd" v-on:setstart="onSetStart"></unitdetail>
     </div>
     <label id="debug">这是调试信息</label>
   </body>

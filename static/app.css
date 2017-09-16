@@ -60,7 +60,7 @@ body, html {
 #findcarbtn {
   height: 2.5rem;
   position: absolute;
-  left: 1rem;
+  left: 0.5rem;
   bottom: 50%; }
 
 #bottombar {
@@ -73,15 +73,5 @@ body, html {
   position: absolute;
   font-size: 0.5rem;
   visibility: hidden; }
-
-#searchunit {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  margin: 0;
-  z-index: 1001;
-  background-color: #eeeef2; }
 
 /*# sourceMappingURL=app.css.map */
