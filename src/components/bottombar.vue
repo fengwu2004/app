@@ -14,11 +14,12 @@ export default {
 <style scoped>
 
   div {
-    background-color: #0b79f2;
+    background-color: #f5a623;
     width: 100%;
     height: 1.6rem;
     padding: 0.7rem 0;
     text-align: center;
+    font-size: 0.8rem;
   }
 
   p {

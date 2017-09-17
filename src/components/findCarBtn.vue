@@ -1,5 +1,6 @@
 <template>
   <div>
+    <div class="bg" v-on:click="docancel" v-if="show"></div>
     <div class="bigbtn" v-on:click="onFindClick"></div>
     <div v-if="show" class="container">
       <div class="btn" v-on:click="findUnit">标记车位</div>
@@ -34,6 +35,10 @@
         this.$emit('onfindcar')
 
         this.show = false
+      },
+      docancel:function() {
+
+        this.show = false
       }
     }
   }
@@ -57,8 +62,8 @@
   .btn {
 
     display: inline-block;
-    font-size: 1rem;
-    font-weight: bold;
+    font-size: 0.8rem;
+    font-weight: lighter;
     padding: 3px 3px;
     margin: 3px 3px;
     background-color: #FF4343;
@@ -77,4 +82,12 @@
     z-index: 1;
   }
 
+  .bg {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    opacity: 1;
+  }
 </style>

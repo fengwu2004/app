@@ -1,8 +1,11 @@
 <template>
-  <div class="main" v-on:click="click">
-    <label>取消标记</label>
+  <div>
     <div class="bg" v-on:click="clickbg"></div>
+    <div class="main" v-on:click="click">
+      <label>取消标记</label>
+    </div>
   </div>
+
 </template>
 
 <script>

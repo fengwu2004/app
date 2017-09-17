@@ -64,7 +64,7 @@
       <zoom v-bind:map="map"></zoom>
     </div>
     <div id="searchunit">
-      <searchunit v-on:navigatetounit="onNavigateToUnit" v-on:navigatetofacility="onNavigateToFacility" v-bind:allunits="allunits" v-bind:facilitys="allfacilitys"></searchunit>
+      <searchunit v-if="show" v-on:navigatetounit="onNavigateToUnit" v-on:navigatetofacility="onNavigateToFacility" v-bind:allunits="allunits" v-bind:facilitys="allfacilitys"></searchunit>
     </div>
     <div id="navigatestop">
       <navigatestop v-if="show" v-on:click="click"></navigatestop>

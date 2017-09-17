@@ -15,12 +15,15 @@ import findwithunit from './components/findWithUnit.vue'
 import unitdetail from './components/unitdetail.vue'
 import navigatestop from './components/navigatestop.vue'
 import cancelmark from './components/cancelmark.vue'
+import searchunit from './components/searchunit.vue'
+
+var _searchunit = null
 
 var config = require('../config')
 
 Vue.config.productionTip = false
 
-var regionId = '14980981254061534'
+var regionId = '15017532736109386'
 
 var idrMapView = indoorun.idrMapView
 
@@ -98,7 +101,7 @@ var gmtime = new Date().getTime()
 
 map.initMap('2b497ada3b2711e4b60500163e0e2e6b', 'map', regionId)
 
-var getSaveUnit = true
+var getSaveUnit = false
 
 map.addEventListener(map.eventTypes.onFloorChangeSuccess, function(data) {
   
@@ -121,7 +124,11 @@ map.addEventListener(map.eventTypes.onFloorChangeSuccess, function(data) {
   
   // indoorun.idrDebug.showDebugInfo(true)
   
-  showSearchUnitView()
+  setTimeout(()=>{
+  
+    showSearchUnitView()
+    
+  }, 1000)
   
   indoorun.idrDebug.debugInfo('加载时间:' + (new Date().getTime() - gmtime).toString())
   
@@ -200,7 +207,7 @@ map.addEventListener(map.eventTypes.onRouterFinish, function() {
 
 function addCarMarker(pos) {
   
-  var marker = new indoorun.idrMapMarker.IDRCarMarker(pos, config.publicPath + '/static/markericon/车位标记点.png')
+  var marker = new indoorun.idrMapMarker.IDRCarMarker(pos, config.publicPath + '/static/markericon/car.png')
   
   map.addMarker(marker)
   
@@ -236,7 +243,7 @@ map.addEventListener(map.eventTypes.onInitMapSuccess, function(regionEx) {
   
   showFindCarBtn()
   
-  document.title = regionEx.name
+  document.title = '定位导航'
   
   zoomView = new ZoomView(map)
   
@@ -299,7 +306,9 @@ function onFindTargetUnits(units) {
 
 function onMarkUnitInMap(cb) {
   
-  showBottomBar(true, '长按车位进行选择')
+  _searchunit.show = false
+  
+  showBottomBar(true, '温馨提示:长按地图车位框0.5秒，可实现车位标记')
   
   map.removeEventListener(map.eventTypes.onUnitClick)
   
@@ -319,6 +328,8 @@ function onMarkUnitInMap(cb) {
     })
     
     showBottomBar(false, '')
+    
+    _searchunit.show = true
   
     cb && cb(unit.getPos())
   })
@@ -510,6 +521,8 @@ function showFindCarWithUnit(title, currentFloorId, resolve) {
     _findcarwithunit.show = true
     
     _findcarwithunit.resolve = resolve
+  
+    _findcarwithunit.title = title
     
     return
   }
@@ -655,6 +668,8 @@ function showFindCarBtn() {
   
         showMarkCarView(function(pos) {
           
+          map.removeMarker(_carMarker)
+          
           _carPos = pos
           
           _carMarker = addCarMarker(pos)
@@ -687,20 +702,20 @@ function getFacilitys() {
 var futi = {
   type:1,
   title:'扶梯',
-  icon:'./static/扶梯.png'
+  icon:'./static/futi.png'
 }
 
 var dianti = {
   
   type:2,
   title:'电梯',
-  icon:'./static/电梯.png'
+  icon:'./static/dianti.png'
 }
 
 var xishoujian = {
   type:3,
   title:'洗手间',
-  icon:'./static/洗手间.png'
+  icon:'./static/xishoujian.png'
 }
 
 var atm = {
@@ -712,13 +727,13 @@ var atm = {
 var chukou = {
   type:5,
   title:'出口',
-  icon:'./static/出口.png'
+  icon:'./static/chukou.png'
 }
 
 var rukou = {
   type:7,
   title:'入口',
-  icon:'./static/入口.png'
+  icon:'./static/rukou.png'
 }
 
 var anquanchukou = {
@@ -730,7 +745,7 @@ var anquanchukou = {
 var louti = {
   type:9,
   title:'楼梯',
-  icon:'./static/楼梯.png'
+  icon:'./static/louti.png'
 }
 
 var xiche = {
@@ -742,7 +757,7 @@ var xiche = {
 var shoufeichu = {
   type:11,
   title:'收费处',
-  icon:'./static/收费处.png'
+  icon:'./static/shoufeichu.png'
 }
 
 function getIcons(type) {
@@ -768,11 +783,12 @@ function getIcons(type) {
   if (type == 11) return shoufeichu
 }
 
-import searchunit from './components/searchunit.vue'
-let _searchunit = null
+
 function showSearchUnitView() {
   
   if (_searchunit) {
+  
+    _searchunit.show = true
   
     _searchunit.allunits = map.regionEx.getAllUnits(map.getFloorId())
     
@@ -785,7 +801,8 @@ function showSearchUnitView() {
     data: ()=> {
       return {
         allunits:map.regionEx.getAllUnits(map.getFloorId()),
-        allfacilitys:getFacilitys()
+        allfacilitys:getFacilitys(),
+        show:true
       }
     },
     methods:{
@@ -847,6 +864,8 @@ function show(unit, cb) {
         this.show = false
   
         _findCarBtnView.show = true
+  
+        this.cb && this.cb(2)
       },
       onSetStart:function() {
       
@@ -870,7 +889,7 @@ function show(unit, cb) {
 
 function addEndMarker(pos) {
   
-  var endMarker = new indoorun.idrMapMarker.IDREndMarker(pos, config.publicPath + '/static/markericon/终点.png')
+  var endMarker = new indoorun.idrMapMarker.IDREndMarker(pos, config.publicPath + '/static/markericon/end.png')
   
   map.addMarker(endMarker)
   
@@ -879,7 +898,7 @@ function addEndMarker(pos) {
 
 function addStartMaker(pos) {
   
-  var marker = new indoorun.idrMapMarker.IDRStartMarker(pos, config.publicPath + '/static/markericon/起点.png')
+  var marker = new indoorun.idrMapMarker.IDRStartMarker(pos, config.publicPath + '/static/markericon/start.png')
   
   map.addMarker(marker)
   
@@ -899,20 +918,31 @@ function selectUnit(unit) {
     })
     .then((marker)=>{
     
-      return new Promise((resolve)=>{
+      return new Promise((resolve, reject)=>{
         
         show(unit, (res)=>{
           
           if (res == 0) {
             
             resolve({action:'start', marker:marker})
+            
+            return
           }
-          else {
+          
+          if (res == 1) {
   
             resolve({action:'end', marker:marker})
+            
+            return
           }
+          
+          reject(marker)
         })
       })
+    })
+    .catch((marker)=>{
+    
+      map.removeMarker(marker)
     })
     .then((res)=>{
     

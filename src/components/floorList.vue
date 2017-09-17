@@ -105,9 +105,9 @@
   }
 
   .currentName {
-    background: url("../assets/lou-01.png") no-repeat;
+    background: url("../assets/楼层切换1.png") no-repeat;
     background-size: 2.3rem;
-    color: #fff;
+    color: #030303;
     text-align: center;
     width: 2.3rem;
     height: 2.3rem;
@@ -120,15 +120,16 @@
     height: 2.3rem;
     line-height: 2.3rem;
     text-align: center;
-    padding: 3px 0;
+    margin: 5px 0;
+    background: url("../assets/楼层切换3.png") no-repeat center;
   }
 
   .selected{
-    background: url("../assets/lcbg.png") no-repeat center;
+    background: url("../assets/楼层切换2.png") no-repeat center;
     -webkit-background-size: contain;
     background-size: contain;
     color: #fff;
-    line-height: 2.5rem;
+    line-height: 2.3rem;
     text-align: center;
   }
 

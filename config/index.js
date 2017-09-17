@@ -1,7 +1,7 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 var path = require('path')
 
-var build_assetsPublicPath = 'http://wx.indoorun.com/indoorun/test/app/webapp/'
+var build_assetsPublicPath = 'http://wx.indoorun.com/indoorun/app/qf/app/webapp/'
 var dev_assetsPublicPath = ''
 
 module.exports = {
