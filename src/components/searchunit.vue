@@ -22,7 +22,7 @@
     </div>
     <div class="inputComponent">
       <div class="search"/>
-      <input v-model="value" v-on:focus="onFocus" type="search" class="searhinput" placeholder="输入商铺名车、车位号、服务设施">
+      <input v-model="value" v-on:focus="onFocus" type="search" class="searhinput" placeholder="输入商铺名称、车位号、服务设施">
       <div v-if="start" class="cancel" type="submit"/>
       <div v-if="!start" class="submit" type="submit">搜索</div>
     </div>
